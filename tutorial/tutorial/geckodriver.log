@@ -1,0 +1,30 @@
+1499272347385	geckodriver	INFO	Listening on 127.0.0.1:54594
+1499272348485	geckodriver::marionette	INFO	Starting browser /Applications/Firefox.app/Contents/MacOS/firefox-bin with args ["-marionette"]
+1499272350442	Marionette	INFO	Listening on port 54604
+1499272350493	Marionette	WARN	TLS certificate errors will be ignored for this session
+1499272350678	Marionette	DEBUG	loaded listener.js
+2017-07-05 09:32:30.740 plugin-container[11181:901987] *** CFMessagePort: bootstrap_register(): failed 1100 (0x44c) 'Permission denied', port = 0x963f, name = 'com.apple.tsm.portname'
+See /usr/include/servers/bootstrap_defs.h for the error codes.
+2017-07-05 09:32:30.741 plugin-container[11181:901987] *** CFMessagePort: bootstrap_register(): failed 1100 (0x44c) 'Permission denied', port = 0x9747, name = 'com.apple.CFPasteboardClient'
+See /usr/include/servers/bootstrap_defs.h for the error codes.
+2017-07-05 09:32:30.741 plugin-container[11181:901987] void __CFPasteboardSetup() : Failed to allocate communication port for com.apple.CFPasteboardClient; this is likely due to sandbox restrictions
+1499272387012	geckodriver	INFO	Listening on 127.0.0.1:54676
+1499272388105	geckodriver::marionette	INFO	Starting browser /Applications/Firefox.app/Contents/MacOS/firefox-bin with args ["-marionette"]
+1499272390054	Marionette	INFO	Listening on port 54685
+1499272390103	Marionette	WARN	TLS certificate errors will be ignored for this session
+1499272390283	Marionette	DEBUG	loaded listener.js
+2017-07-05 09:33:10.348 plugin-container[11195:902658] *** CFMessagePort: bootstrap_register(): failed 1100 (0x44c) 'Permission denied', port = 0x953f, name = 'com.apple.tsm.portname'
+See /usr/include/servers/bootstrap_defs.h for the error codes.
+2017-07-05 09:33:10.349 plugin-container[11195:902658] *** CFMessagePort: bootstrap_register(): failed 1100 (0x44c) 'Permission denied', port = 0x9847, name = 'com.apple.CFPasteboardClient'
+See /usr/include/servers/bootstrap_defs.h for the error codes.
+2017-07-05 09:33:10.349 plugin-container[11195:902658] void __CFPasteboardSetup() : Failed to allocate communication port for com.apple.CFPasteboardClient; this is likely due to sandbox restrictions
+1499272392438	Marionette	INFO	Ceased listening
+1499272450033	addons.productaddons	WARN	Failed downloading XML, status: 0, reason: error
+1499272450814	addons.productaddons	WARN	Failed downloading via XHR, status: 0, reason: error
+*************************
+A coding exception was thrown and uncaught in a Task.
+
+Full message: TypeError: NetworkError when attempting to fetch resource.
+Full stack: 
+*************************
+1499273185974	Marionette	INFO	Ceased listening
