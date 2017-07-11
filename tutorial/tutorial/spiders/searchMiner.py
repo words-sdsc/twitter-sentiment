@@ -18,6 +18,8 @@ import sys
 
 import unittest, time, re
 
+PRINT_HTML_SRC = False
+
 class QuotesSpider(scrapy.Spider):
     name = "twitter"
 
@@ -34,8 +36,6 @@ class QuotesSpider(scrapy.Spider):
         # urls(keyword) 
         urls = [
             'https://twitter.com/search?q=%23cocos%20fire&src=typd',
-            #'https://twitter.com/',
-            #'http://www.karlrummler.com',
         ]
 
         # Make a request for each url to be parsed below
@@ -49,9 +49,9 @@ class QuotesSpider(scrapy.Spider):
 
         # Check if tag is found
         if response.xpath('//div[@class="js-tweet-text-container"]//text()').extract() is None:
-            print("Text container not found")
+            print("Text container not found\n\n")
         else:
-            print("Text container is found")
+            print("Text container is found\n\n")
 
         # Get the URL
         #self.driver.get(self.base_url + "/search?q=stckoverflow&src=typd")
@@ -66,11 +66,11 @@ class QuotesSpider(scrapy.Spider):
         raw_html = self.driver.page_source
 
         # Convert raw html (string) to List via Selector (from Scrapy)
-        tweetTextsList = Selector(text=raw_html).xpath('//div[@class="js-tweet-text-container"]//text()').extract()
-        print("\n\n\n")
-        print(tweetTextsList)
-        print("\n\n\n")
-        
+        tweetTextsList = Selector(text=raw_html).xpath('//div[@class="js-tweet-text-container"]//text()')#.extract()
+        print ( tweetTextsList )
+        # Print out the raw list
+        # print("\n\n\n%s\n\n\n" % tweetTextsList )
+        return       
         """
         # NOTE: This is the scrapy way, you can't execute a script through
         # Must use //text() to indicate grabbing all text from all children as well
@@ -84,7 +84,7 @@ class QuotesSpider(scrapy.Spider):
 
         # Write each tweet to text file
         count = 0
-        thefile = open("Words.txt", 'w')
+        thefile = open("../../../Tweets.txt", 'w')
         for tweet in tweetTextsList:
             #print( str(count) + ': ' + tweet ) 
             # Ignore empty tweets
@@ -93,13 +93,14 @@ class QuotesSpider(scrapy.Spider):
             count += 1
 
         # Write entire html to File
-        filename = "twitterSearchContent.html"
-        with open(filename, 'wb') as f:
-            f.write(response.body)
+        if PRINT_HTML_SRC:
+            filename = "twitterSearchContent.html"
+            with open(filename, 'wb') as f:
+                f.write(response.body)
 
-        print("\n\n")
+            self.log('Saved file %s' % filename)
+        print("------------------------")
 
-        self.log('Saved file %s' % filename)
 
         self.driver.close() # Quit the browser after completion
 
