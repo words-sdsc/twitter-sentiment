@@ -18,6 +18,9 @@ import sys
 
 import unittest, time, re
 
+# Import Beautiful soup
+from bs4 import BeautifulSoup
+
 PRINT_HTML_SRC = False
 
 class QuotesSpider(scrapy.Spider):
@@ -66,30 +69,38 @@ class QuotesSpider(scrapy.Spider):
         raw_html = self.driver.page_source
 
         # Convert raw html (string) to List via Selector (from Scrapy)
-        tweetTextsList = Selector(text=raw_html).xpath('//div[@class="js-tweet-text-container"]//text()')#.extract()
+        #tweetTextsList = Selector(text=raw_html).xpath('//div[@class="js-tweet-text-container"]//text()')#.extract()
+
+        # Use beautiful soup to extract the innerHTML for each text
+        soup = BeautifulSoup(raw_html, 'html.parser')
+        tweetTextsList = soup.find_all("div", {"class":"js-tweet-text-container"})
+
         print ( tweetTextsList )
+
         # Print out the raw list
         # print("\n\n\n%s\n\n\n" % tweetTextsList )
-        return       
         """
         # NOTE: This is the scrapy way, you can't execute a script through
         # Must use //text() to indicate grabbing all text from all children as well
         tweetTextsList = response.xpath('//div[@class="js-tweet-text-container"]//text()').extract()
         print( response )
         """
-
+        
+        """
         # Convert to string and then split into list based on new lines
         tweetText = ''.join(tweetTextsList)
         tweetTextsList = tweetText.split('\n')
+        """
 
         # Write each tweet to text file
         count = 0
         thefile = open("../../../Tweets.txt", 'w')
         for tweet in tweetTextsList:
-            #print( str(count) + ': ' + tweet ) 
             # Ignore empty tweets
-            if tweet != "":
-                thefile.write("%s\n" % tweet )
+            tweetText = ''.join(tweet.findAll(text=True))
+            if tweetText != "":
+                thefile.write("%s\n" % tweetText )
+                
             count += 1
 
         # Write entire html to File
