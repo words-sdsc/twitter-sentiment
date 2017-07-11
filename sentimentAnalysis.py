@@ -27,6 +27,7 @@ myString = remove_non_ascii_1(myString)
 #print(myString) 
 print( stringArr )
 index = 0
+
 # Annotate the string using coreNLP
 for string in stringArr:
     res = nlp.annotate(string,
