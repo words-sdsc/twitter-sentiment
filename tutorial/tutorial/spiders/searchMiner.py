@@ -21,10 +21,14 @@ import unittest, time, re
 # Import Beautiful soup
 from bs4 import BeautifulSoup
 
-PRINT_HTML_SRC = False
+TARGET_URL = 'https://twitter.com/search?q=%23cocos%20fire&src=typd'
+
+# Storage locations for tweets
+tweetFile = "../../../Tweets.txt"
+dateTweetFile = "../../../DateAndTweets.txt"
 
 class QuotesSpider(scrapy.Spider):
-    name = "twitter"
+    name = "twitter"    # Unique name for Scrapy to identify this crawler
 
     # Initialize to front as a Firefox() browser; selenium
     def __init__(self):
@@ -38,7 +42,8 @@ class QuotesSpider(scrapy.Spider):
     def start_requests(self):
         # urls(keyword) 
         urls = [
-            'https://twitter.com/search?q=%23cocos%20fire&src=typd',
+            #'https://twitter.com/search?q=%23cocos%20fire&src=typd',
+            'https://twitter.com/search?q=%23WhittierFire&src=tyah',
         ]
 
         # Make a request for each url to be parsed below
@@ -47,71 +52,58 @@ class QuotesSpider(scrapy.Spider):
 
     # Method called after each scrapy request
     def parse(self, response):
-        print("------------------------")
-        print("INDICIATING IF TEXT WAS FOUND: \n\n")
-
-        # Check if tag is found
-        if response.xpath('//div[@class="js-tweet-text-container"]//text()').extract() is None:
-            print("Text container not found\n\n")
-        else:
-            print("Text container is found\n\n")
-
         # Get the URL
-        #self.driver.get(self.base_url + "/search?q=stckoverflow&src=typd")
-        self.driver.get('https://twitter.com/search?q=%23cocos%20fire&src=typd')
+        #self.driver.get('https://twitter.com/search?q=%23cocos%20fire&src=typd')
+        self.driver.get('https://twitter.com/search?q=%23WhittierFire&src=tyah')
 
-        # Scroll down the URL via Selenium
+        # TODO Have loop invariant be when the for loop hits the bottom
+        # Scroll down the webpage via Selenium (infinite scrolling)
         for i in range(1,5):
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(.5)
         
-        # Get teh raw HTML source after scrolling via selenium
+        # Get the raw HTML source after scrolling via selenium
         raw_html = self.driver.page_source
 
-        # Convert raw html (string) to List via Selector (from Scrapy)
-        #tweetTextsList = Selector(text=raw_html).xpath('//div[@class="js-tweet-text-container"]//text()')#.extract()
-
-        # Use beautiful soup to extract the innerHTML for each text
+        # Use beautiful soup to extract ALL the innerHTML for each tweet
         soup = BeautifulSoup(raw_html, 'html.parser')
         tweetTextsList = soup.find_all("div", {"class":"js-tweet-text-container"})
+        tweetDateList = soup.find_all("span", {"class":"_timestamp js-short-timestamp "})
 
-        print ( tweetTextsList )
+        tweetIdTagList = soup.find_all(attrs={'data-tweet-id' : True})
 
-        # Print out the raw list
-        # print("\n\n\n%s\n\n\n" % tweetTextsList )
-        """
-        # NOTE: This is the scrapy way, you can't execute a script through
-        # Must use //text() to indicate grabbing all text from all children as well
-        tweetTextsList = response.xpath('//div[@class="js-tweet-text-container"]//text()').extract()
-        print( response )
-        """
+        print( tweetIdTagList )
+
+        print( "IFJDSLKFJASL\n\n\n")
+        tweetIdList = []
+        for tweetId in tweetIdTagList:
+            tweetIdList.append(tweetId['data-tweet-id'])
         
-        """
-        # Convert to string and then split into list based on new lines
-        tweetText = ''.join(tweetTextsList)
-        tweetTextsList = tweetText.split('\n')
-        """
+        print( tweetIdList )
 
         # Write each tweet to text file
-        count = 0
-        thefile = open("../../../Tweets.txt", 'w')
+        thefile = open(tweetFile, 'w')
         for tweet in tweetTextsList:
-            # Ignore empty tweets
+            # Grab tweet text
             tweetText = ''.join(tweet.findAll(text=True))
+
+            # Ignore empty tweets
             if tweetText != "":
                 thefile.write("%s\n" % tweetText )
                 
-            count += 1
+        # Write file with both date and tweet
+        thefile = open(dateTweetFile, 'w')
+        for tweet, date in zip(tweetTextsList, tweetDateList):
+            # Grab date/tweet text
+            tweetText = ''.join(tweet.findAll(text=True))
+            date = ''.join(date.findAll(text=True))
 
-        # Write entire html to File
-        if PRINT_HTML_SRC:
-            filename = "twitterSearchContent.html"
-            with open(filename, 'wb') as f:
-                f.write(response.body)
+            # Ignore empty tweets
+            if tweetText != "":
+                thefile.write("Date: %s%s\n" % (date, tweetText))
 
-            self.log('Saved file %s' % filename)
-        print("------------------------")
+        # Write down db info
+        
 
-
-        self.driver.close() # Quit the browser after completion
-
+        # Quit the browser after completion
+        self.driver.close() 
