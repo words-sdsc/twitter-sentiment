@@ -70,11 +70,10 @@ class QuotesSpider(scrapy.Spider):
         tweetTextsList = soup.find_all("div", {"class":"js-tweet-text-container"})
         tweetDateList = soup.find_all("span", {"class":"_timestamp js-short-timestamp "})
 
-        tweetIdTagList = soup.find_all(attrs={'data-tweet-id' : True})
+        # Grabs all tags containing the attribute 'data-tweet-id', the True value means any
+        tweetIdTagList = soup.find_all(attrs={'data-tweet-id' : True}) 
 
-        print( tweetIdTagList )
-
-        print( "IFJDSLKFJASL\n\n\n")
+        # Create list of tweet ids
         tweetIdList = []
         for tweetId in tweetIdTagList:
             tweetIdList.append(tweetId['data-tweet-id'])
@@ -93,14 +92,15 @@ class QuotesSpider(scrapy.Spider):
                 
         # Write file with both date and tweet
         thefile = open(dateTweetFile, 'w')
-        for tweet, date in zip(tweetTextsList, tweetDateList):
+        for tweet, date, tweetId in zip(tweetTextsList, tweetDateList, tweetIdList):
             # Grab date/tweet text
             tweetText = ''.join(tweet.findAll(text=True))
             date = ''.join(date.findAll(text=True))
+            tweetId = str(tweetId)
 
             # Ignore empty tweets
             if tweetText != "":
-                thefile.write("Date: %s%s\n" % (date, tweetText))
+                thefile.write("Date: %s\nTweet ID: %s%s\n" % (date, tweetId, tweetText))
 
         # Write down db info
         
