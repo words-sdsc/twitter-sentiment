@@ -6,21 +6,32 @@ from time import sleep
 def remove_non_ascii_1(text):
     return ''.join(i for i in text if ord(i)<128)
 
-filename = "Words.txt"
+filename = "Tweets.txt"
 myString = ""
 stringArr = []
 count = 0
+
+# Form list of string in buckets of 4
 with open(filename, 'r') as f:
     for line in f:
         count += 1
         myString += line
         
         # Buckets of strings in array
-        if count == 8:
+        if count == 4:
+            #myString = myString.replace(".","")
+            #myString = myString.replace("?","")
+            #myString = myString.replace("!","")
+            myString += "."
             stringArr.append(myString)
             count = 0
             myString = ""
+            
 if myString != "":
+    #myString = myString.replace(".","")
+    #myString = myString.replace("?","")
+    #myString = myString.replace("!","")
+    myString += "."
     stringArr.append(myString)
 
 myString = remove_non_ascii_1(myString)
