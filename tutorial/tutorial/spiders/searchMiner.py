@@ -21,11 +21,16 @@ import unittest, time, re
 # Import Beautiful soup
 from bs4 import BeautifulSoup
 
+# Import database storage
+from insertTweetInfo import insertTweetInfo
+
 TARGET_URL = 'https://twitter.com/search?q=%23cocos%20fire&src=typd'
 
 # Storage locations for tweets
 tweetFile = "../../../Tweets.txt"
 dateTweetFile = "../../../DateAndTweets.txt"
+dbLocation = "../../../sql/TweetInfo.db"
+dbName = "TWEET_INFO"    # TODO Change this later to dynamically be based on URL
 
 class QuotesSpider(scrapy.Spider):
     name = "twitter"    # Unique name for Scrapy to identify this crawler
@@ -70,7 +75,7 @@ class QuotesSpider(scrapy.Spider):
         tweetTextsList = soup.find_all("div", {"class":"js-tweet-text-container"})
         tweetDateList = soup.find_all("span", {"class":"_timestamp js-short-timestamp "})
 
-        # Grabs all tags containing the attribute 'data-tweet-id', the True value means any
+        # Grab ALL tag with attr 'data-tweet-id'
         tweetIdTagList = soup.find_all(attrs={'data-tweet-id' : True}) 
 
         # Create list of tweet ids
@@ -78,7 +83,14 @@ class QuotesSpider(scrapy.Spider):
         for tweetId in tweetIdTagList:
             tweetIdList.append(tweetId['data-tweet-id'])
         
-        print( tweetIdList )
+        # Grab all the exact unix-format times
+        # FIXME UNIXTIMES TAG NOT WORKING PROPERLY FIXME
+        unixTimesTagList = soup.find_all(attrs={'data-time' : True})
+        
+        # Add all unix times
+        unixTimesList = []
+        for timeStamp in unixTimesTagList:
+            unixTimesList.append(timeStamp['data-time'])
 
         # Write each tweet to text file
         thefile = open(tweetFile, 'w')
@@ -90,19 +102,37 @@ class QuotesSpider(scrapy.Spider):
             if tweetText != "":
                 thefile.write("%s\n" % tweetText )
                 
-        # Write file with both date and tweet
+
+        # Write DATE/TIME/EXACT_TIME/TWEET to file 
         thefile = open(dateTweetFile, 'w')
-        for tweet, date, tweetId in zip(tweetTextsList, tweetDateList, tweetIdList):
+
+        for tweet, date, tweetId, unixTime in zip(tweetTextsList, tweetDateList, \
+                tweetIdList, unixTimesList):
+
             # Grab date/tweet text
             tweetText = ''.join(tweet.findAll(text=True))
             date = ''.join(date.findAll(text=True))
             tweetId = str(tweetId)
+            unixTime = str(unixTime)
 
             # Ignore empty tweets
             if tweetText != "":
-                thefile.write("Date: %s\nTweet ID: %s%s\n" % (date, tweetId, tweetText))
+                thefile.write("Date: %s\nUnixTime:%s\nTweet ID: %s%s\n" % (date, \
+                unixTime, tweetId, tweetText))
 
         # Write down db info
+        for tweet, date, tweetId, unixTime in zip(tweetTextsList, tweetDateList, \
+                tweetIdList, unixTimesList):
+
+            # Extract date/tweet text
+            tweet = ''.join(tweet.findAll(text=True))
+            date = ''.join(date.findAll(text=True))
+            tweetId = str(tweetId)
+            unixTime = str(unixTime)
+            
+            # Insert information to DB
+            insertTweetInfo( str(dbName), str(dbLocation), str(tweetId), str(date), \
+                    str(unixTime), str(tweet), -1 )
         
 
         # Quit the browser after completion
