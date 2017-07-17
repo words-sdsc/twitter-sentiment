@@ -28,9 +28,6 @@ with open(filename, 'r') as f:
             myString = ""
             
 if myString != "":
-    #myString = myString.replace(".","")
-    #myString = myString.replace("?","")
-    #myString = myString.replace("!","")
     myString += "."
     stringArr.append(myString)
 
