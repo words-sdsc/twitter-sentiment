@@ -25,12 +25,13 @@ from bs4 import BeautifulSoup
 from insertTweetInfo import insertTweetInfo
 
 #TARGET_URL = 'https://twitter.com/search?q=%23cocos%20fire&src=typd'
-TARGET_URL = 'https://twitter.com/hashtag/AlamoFire?src=hash'
+#TARGET_URL = 'https://twitter.com/hashtag/AlamoFire?src=hash'
+TARGET_URL = 'https://twitter.com/search?q=lol&src=typd'
 # Storage locations for tweets
 tweetFile = "../../../Tweets.txt"
 dateTweetFile = "../../../DateAndTweets.txt"
 dbLocation = "../../../sql/TweetInfo.db"
-dbName = "TWEET_INFO_2"    # TODO Change this later to dynamically be based on URL
+dbName = "TWEET_INFO_LOL"    # TODO Change this later to dynamically be based on URL
 
 
 class QuotesSpider(scrapy.Spider):
@@ -58,7 +59,8 @@ class QuotesSpider(scrapy.Spider):
     # Method called after each scrapy request
     def parse(self, response):
         # Get the URL for selenium
-        self.driver.get('https://twitter.com/search?q=%23WhittierFire&src=tyah')
+        #self.driver.get('https://twitter.com/search?q=%23WhittierFire&src=tyah')
+        self.driver.get('https://twitter.com/search?q=lol&src=typd')
 
         # TODO Have loop invariant be when the for loop hits the bottom
         # Scroll down the webpage via Selenium (infinite scrolling)
@@ -73,6 +75,8 @@ class QuotesSpider(scrapy.Spider):
         soup = BeautifulSoup(raw_html, 'html.parser')
         tweetTextsList = soup.find_all("div", {"class":"js-tweet-text-container"})
         tweetDateList = soup.find_all("span", {"class":"_timestamp js-short-timestamp "})
+    #js-short-timestamp 
+        print(len(tweetDateList))
 
         # Grab ALL tag with attr 'data-tweet-id'
         tweetIdTagList = soup.find_all(attrs={'data-tweet-id' : True}) 
@@ -90,15 +94,32 @@ class QuotesSpider(scrapy.Spider):
         for timeStamp in unixTimesTagList:
             unixTimesList.append(timeStamp['data-time'])
                 
+
+        print()
+        print()
+        print()
+        print()
+        print()
+        print(len(tweetTextsList))
+        #print(len(tweetDateList))
+        print(len(tweetIdList))
+        print(len(unixTimesList))
+        print()
+        print()
+        print()
+        print()
+        print()
+
         # TODO TURN THIS INTO A METHOD
         # Write down db info
-        for tweet, date, tweetId, unixTime in zip(tweetTextsList, tweetDateList, \
+        for tweet, tweetId, unixTime in zip(tweetTextsList,  \
                 tweetIdList, unixTimesList):
 
             # Extract date/tweet text
             tweet = ''.join(tweet.findAll(text=True))
             tweet = tweet.replace('\n', '')
-            date = ''.join(date.findAll(text=True))
+            print(tweet)
+            #date = ''.join(date.findAll(text=True))
             tweetId = str(tweetId)
             unixTime = str(unixTime)
             
