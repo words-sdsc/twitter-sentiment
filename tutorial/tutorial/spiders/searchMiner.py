@@ -24,13 +24,14 @@ from bs4 import BeautifulSoup
 # Import database storage
 from insertTweetInfo import insertTweetInfo
 
-TARGET_URL = 'https://twitter.com/search?q=%23cocos%20fire&src=typd'
-
+#TARGET_URL = 'https://twitter.com/search?q=%23cocos%20fire&src=typd'
+TARGET_URL = 'https://twitter.com/hashtag/AlamoFire?src=hash'
 # Storage locations for tweets
 tweetFile = "../../../Tweets.txt"
 dateTweetFile = "../../../DateAndTweets.txt"
 dbLocation = "../../../sql/TweetInfo.db"
-dbName = "TWEET_INFO"    # TODO Change this later to dynamically be based on URL
+dbName = "TWEET_INFO_2"    # TODO Change this later to dynamically be based on URL
+
 
 class QuotesSpider(scrapy.Spider):
     name = "twitter"    # Unique name for Scrapy to identify this crawler
@@ -47,7 +48,6 @@ class QuotesSpider(scrapy.Spider):
     def start_requests(self):
         # urls(keyword) 
         urls = [
-            #'https://twitter.com/search?q=%23cocos%20fire&src=typd',
             'https://twitter.com/search?q=%23WhittierFire&src=tyah',
         ]
 
@@ -57,13 +57,12 @@ class QuotesSpider(scrapy.Spider):
 
     # Method called after each scrapy request
     def parse(self, response):
-        # Get the URL
-        #self.driver.get('https://twitter.com/search?q=%23cocos%20fire&src=typd')
+        # Get the URL for selenium
         self.driver.get('https://twitter.com/search?q=%23WhittierFire&src=tyah')
 
         # TODO Have loop invariant be when the for loop hits the bottom
         # Scroll down the webpage via Selenium (infinite scrolling)
-        for i in range(1,5):
+        for i in range(1,20):
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(.5)
         
@@ -84,48 +83,21 @@ class QuotesSpider(scrapy.Spider):
             tweetIdList.append(tweetId['data-tweet-id'])
         
         # Grab all the exact unix-format times
-        # FIXME UNIXTIMES TAG NOT WORKING PROPERLY FIXME
         unixTimesTagList = soup.find_all(attrs={'data-time' : True})
         
         # Add all unix times
         unixTimesList = []
         for timeStamp in unixTimesTagList:
             unixTimesList.append(timeStamp['data-time'])
-
-        # Write each tweet to text file
-        thefile = open(tweetFile, 'w')
-        for tweet in tweetTextsList:
-            # Grab tweet text
-            tweetText = ''.join(tweet.findAll(text=True))
-
-            # Ignore empty tweets
-            if tweetText != "":
-                thefile.write("%s\n" % tweetText )
                 
-
-        # Write DATE/TIME/EXACT_TIME/TWEET to file 
-        thefile = open(dateTweetFile, 'w')
-
-        for tweet, date, tweetId, unixTime in zip(tweetTextsList, tweetDateList, \
-                tweetIdList, unixTimesList):
-
-            # Grab date/tweet text
-            tweetText = ''.join(tweet.findAll(text=True))
-            date = ''.join(date.findAll(text=True))
-            tweetId = str(tweetId)
-            unixTime = str(unixTime)
-
-            # Ignore empty tweets
-            if tweetText != "":
-                thefile.write("Date: %s\nUnixTime:%s\nTweet ID: %s%s\n" % (date, \
-                unixTime, tweetId, tweetText))
-
+        # TODO TURN THIS INTO A METHOD
         # Write down db info
         for tweet, date, tweetId, unixTime in zip(tweetTextsList, tweetDateList, \
                 tweetIdList, unixTimesList):
 
             # Extract date/tweet text
             tweet = ''.join(tweet.findAll(text=True))
+            tweet = tweet.replace('\n', '')
             date = ''.join(date.findAll(text=True))
             tweetId = str(tweetId)
             unixTime = str(unixTime)
