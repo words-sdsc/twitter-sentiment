@@ -3,3 +3,5 @@ keys.py
 Words.txt
 WordsCopy.txt
 .DS_Store
+Old/
+__pycache__
