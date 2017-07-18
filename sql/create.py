@@ -6,11 +6,11 @@ conn = conn.cursor()
 
 # Create table
 
-conn.execute('''CREATE TABLE TWEET_INFO
-         (ID            INT PRIMARY KEY NOT NULL,
-         DATE           TEXT            NOT NULL,
-         EPOCH          INT             NOT NULL,
-         TWEET          CHAR(250)       NOT NULL,
+conn.execute('''CREATE TABLE TWEET_INFO_2
+         (ID            INT PRIMARY KEY UNIQUE  NOT NULL,
+         DATE           TEXT                    NOT NULL,
+         EPOCH          INT                     NOT NULL,
+         TWEET          CHAR(250)               NOT NULL,
          SENTIMENT      INT);''')
 
 

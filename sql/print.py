@@ -7,16 +7,14 @@ conn = sqlite3.connect('TweetInfo.db')
 
 print( "Opened database successfully" )
 
-cursor = conn.execute("SELECT * from TWEET_INFO")
+cursor = conn.execute("SELECT * from TWEET_INFO_2")
 
 for row in cursor:
-    print( row[0])
-    print( row[1])
-    print( row[2])
-    print( row[3])
-    print( row[4])
-    print()
-    print()
+    print( "Tweet Id: \t%s" % row[0] )
+    print( "Date: \t\t%s" % row[1] )
+    print( "Epoch: \t\t%s" % row[2] )
+    print( "Tweet Text: \t%s" % row[3] )
+    print( "Sentiment: \t%s" % row[4] )
     print()
 
 print( "Operation done successfully" )
