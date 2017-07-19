@@ -6,7 +6,7 @@ conn = conn.cursor()
 
 # Create table
 
-conn.execute('''CREATE TABLE TWEET_INFO_2
+conn.execute('''CREATE TABLE TWEET_INFO_LOL
          (ID            INT PRIMARY KEY UNIQUE  NOT NULL,
          DATE           TEXT                    NOT NULL,
          EPOCH          INT                     NOT NULL,

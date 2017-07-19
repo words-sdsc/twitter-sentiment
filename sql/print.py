@@ -7,7 +7,7 @@ conn = sqlite3.connect('TweetInfo.db')
 
 print( "Opened database successfully" )
 
-cursor = conn.execute("SELECT * from TWEET_INFO_2")
+cursor = conn.execute("SELECT * from TWEET_INFO_LOL")
 
 for row in cursor:
     print( "Tweet Id: \t%s" % row[0] )
