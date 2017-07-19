@@ -1,10 +1,8 @@
+# Scraping imports
 import scrapy
-
-# Get selectors and extract html
 from scrapy.selector import Selector
 from scrapy.http import HtmlResponse
 
-# Selenium imports and time imports
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -14,26 +12,24 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import NoAlertPresentException
-import sys
 
-import unittest, time, re
-
-# Import Beautiful soup
 from bs4 import BeautifulSoup
 
-# Import database storage
+# General imports
+import unittest, time, re
+import sys
+
+# Local imports
 from insertTweetInfo import insertTweetInfo
 
-TARGET_URL = 'https://twitter.com/search?q=lol&src=typd'
-# Storage locations for tweets
-tweetFile = "../../../Tweets.txt"
-dateTweetFile = "../../../DateAndTweets.txt"
-dbLocation = "../../../sql/TweetInfo.db"
-dbName = "TWEET_INFO_LOL"    # TODO Change this later to dynamically be based on URL
+SPIDER_NAME = "twitter"
 
+# Data base info
+dbLocation = "../../../sql/TweetInfo.db"
+dbName = "TWEET_INFO_LOL" 
 
 class QuotesSpider(scrapy.Spider):
-    name = "twitter"    # Unique name for Scrapy to identify this crawler
+    name = SPIDER_NAME
 
     # Initialize to front as a Firefox() browser; selenium
     def __init__(self):
@@ -57,9 +53,8 @@ class QuotesSpider(scrapy.Spider):
     # Method called after each scrapy request
     def parse(self, response):
         # Load page for selenium
-        self.driver.get('https://twitter.com/search?q=lol&src=typd')
+        self.driver.get(url)
 
-        # TODO Have loop invariant be when the for loop hits the bottom
         # Scroll down the webpage via Selenium (infinite scrolling)
         for i in range(1,20):
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -68,17 +63,15 @@ class QuotesSpider(scrapy.Spider):
         # Get the raw HTML source after scrolling via selenium
         raw_html = self.driver.page_source
 
-        # Use beautiful soup to extract ALL the innerHTML for each tweet
+        # extract ALL the innerHTML for each tweet
         soup = BeautifulSoup(raw_html, 'html.parser')
         tweetTextsList = soup.find_all("div", {"class":"js-tweet-text-container"})
         tweetDateList = soup.find_all("span", {"class":"_timestamp js-short-timestamp "})
-    #js-short-timestamp 
-        print(len(tweetDateList))
 
         # Grab ALL tag with attr 'data-tweet-id'
         tweetIdTagList = soup.find_all(attrs={'data-tweet-id' : True}) 
 
-        # Create list of tweet ids
+        # Create list of containing all tweet ids
         tweetIdList = []
         for tweetId in tweetIdTagList:
             tweetIdList.append(tweetId['data-tweet-id'])
@@ -92,23 +85,14 @@ class QuotesSpider(scrapy.Spider):
             unixTimesList.append(timeStamp['data-time'])
                 
 
-        # TODO TURN THIS INTO A METHOD
         # Write down db info
-        for tweet, tweetId, unixTime in zip(tweetTextsList,  \
-                tweetIdList, unixTimesList):
-
-            # Extract date/tweet text
+        for tweet, tweetId, unixTime in zip(tweetTextsList, tweetIdList, unixTimesList):
             tweet = ''.join(tweet.findAll(text=True))
             tweet = tweet.replace('\n', '')
-            print(tweet)
-            #date = ''.join(date.findAll(text=True))
             tweetId = str(tweetId)
             unixTime = str(unixTime)
             
             # Insert information to DB
-            insertTweetInfo( str(dbName), str(dbLocation), str(tweetId),  \
-                    str(unixTime), str(tweet), -1 )
+            insertTweetInfo( dbName, dbLocation, tweetId, unixTime, tweet, -1 )
         
-
-        # Quit the browser after completion
-        self.driver.close() 
+        self.driver.close() # Close web page
