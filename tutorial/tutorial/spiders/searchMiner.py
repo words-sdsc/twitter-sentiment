@@ -24,8 +24,6 @@ from bs4 import BeautifulSoup
 # Import database storage
 from insertTweetInfo import insertTweetInfo
 
-#TARGET_URL = 'https://twitter.com/search?q=%23cocos%20fire&src=typd'
-#TARGET_URL = 'https://twitter.com/hashtag/AlamoFire?src=hash'
 TARGET_URL = 'https://twitter.com/search?q=lol&src=typd'
 # Storage locations for tweets
 tweetFile = "../../../Tweets.txt"
@@ -39,6 +37,7 @@ class QuotesSpider(scrapy.Spider):
 
     # Initialize to front as a Firefox() browser; selenium
     def __init__(self):
+        """ Set up selenium driver """
         self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(30)
         self.base_url = "https://twitter.com"
@@ -47,7 +46,6 @@ class QuotesSpider(scrapy.Spider):
 
     # Begin making requests from select URLS
     def start_requests(self):
-        # urls(keyword) 
         urls = [
             'https://twitter.com/search?q=%23WhittierFire&src=tyah',
         ]
@@ -58,8 +56,7 @@ class QuotesSpider(scrapy.Spider):
 
     # Method called after each scrapy request
     def parse(self, response):
-        # Get the URL for selenium
-        #self.driver.get('https://twitter.com/search?q=%23WhittierFire&src=tyah')
+        # Load page for selenium
         self.driver.get('https://twitter.com/search?q=lol&src=typd')
 
         # TODO Have loop invariant be when the for loop hits the bottom
@@ -95,21 +92,6 @@ class QuotesSpider(scrapy.Spider):
             unixTimesList.append(timeStamp['data-time'])
                 
 
-        print()
-        print()
-        print()
-        print()
-        print()
-        print(len(tweetTextsList))
-        #print(len(tweetDateList))
-        print(len(tweetIdList))
-        print(len(unixTimesList))
-        print()
-        print()
-        print()
-        print()
-        print()
-
         # TODO TURN THIS INTO A METHOD
         # Write down db info
         for tweet, tweetId, unixTime in zip(tweetTextsList,  \
@@ -124,7 +106,7 @@ class QuotesSpider(scrapy.Spider):
             unixTime = str(unixTime)
             
             # Insert information to DB
-            insertTweetInfo( str(dbName), str(dbLocation), str(tweetId), str(date), \
+            insertTweetInfo( str(dbName), str(dbLocation), str(tweetId),  \
                     str(unixTime), str(tweet), -1 )
         
 
