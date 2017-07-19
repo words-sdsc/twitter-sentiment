@@ -1,7 +1,4 @@
-keys.py
 *.pyc
-Words.txt
-WordsCopy.txt
 .DS_Store
-Old/
+geckodriver.log
 __pycache__
