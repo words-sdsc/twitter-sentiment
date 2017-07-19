@@ -1,0 +1,41 @@
+1500500860086	geckodriver	INFO	Listening on 127.0.0.1:53181
+1500500861445	geckodriver::marionette	INFO	Starting browser /Applications/Firefox.app/Contents/MacOS/firefox-bin with args ["-marionette"]
+1500500864084	Marionette	INFO	Listening on port 53195
+1500500864170	Marionette	WARN	TLS certificate errors will be ignored for this session
+1500500864317	Marionette	DEBUG	loaded listener.js
+2017-07-19 14:47:44.379 plugin-container[14115:1019189] *** CFMessagePort: bootstrap_register(): failed 1100 (0x44c) 'Permission denied', port = 0x973f, name = 'com.apple.tsm.portname'
+See /usr/include/servers/bootstrap_defs.h for the error codes.
+2017-07-19 14:47:44.380 plugin-container[14115:1019189] *** CFMessagePort: bootstrap_register(): failed 1100 (0x44c) 'Permission denied', port = 0x9923, name = 'com.apple.CFPasteboardClient'
+See /usr/include/servers/bootstrap_defs.h for the error codes.
+2017-07-19 14:47:44.380 plugin-container[14115:1019189] void __CFPasteboardSetup() : Failed to allocate communication port for com.apple.CFPasteboardClient; this is likely due to sandbox restrictions
+1500500905330	geckodriver	INFO	Listening on 127.0.0.1:53294
+1500500906426	geckodriver::marionette	INFO	Starting browser /Applications/Firefox.app/Contents/MacOS/firefox-bin with args ["-marionette"]
+1500500908319	Marionette	INFO	Listening on port 53304
+1500500908404	Marionette	WARN	TLS certificate errors will be ignored for this session
+1500500908535	Marionette	DEBUG	loaded listener.js
+2017-07-19 14:48:28.597 plugin-container[14130:1019906] *** CFMessagePort: bootstrap_register(): failed 1100 (0x44c) 'Permission denied', port = 0x943f, name = 'com.apple.tsm.portname'
+See /usr/include/servers/bootstrap_defs.h for the error codes.
+2017-07-19 14:48:28.597 plugin-container[14130:1019906] *** CFMessagePort: bootstrap_register(): failed 1100 (0x44c) 'Permission denied', port = 0x9523, name = 'com.apple.CFPasteboardClient'
+See /usr/include/servers/bootstrap_defs.h for the error codes.
+2017-07-19 14:48:28.597 plugin-container[14130:1019906] void __CFPasteboardSetup() : Failed to allocate communication port for com.apple.CFPasteboardClient; this is likely due to sandbox restrictions
+1500500909676	Marionette	DEBUG	Received DOM event "beforeunload" for "about:blank"
+1500500910839	Marionette	DEBUG	Received DOM event "pagehide" for "about:blank"
+1500500910839	Marionette	DEBUG	Received DOM event "unload" for "about:blank"
+1500500911837	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://twitter.com/search?q=%23WhittierFire&src=tyah"
+1500500911982	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://twitter.com/search?q=%23WhittierFire&src=tyah"
+1500500911985	Marionette	DEBUG	Received DOM event "pageshow" for "https://twitter.com/search?q=%23WhittierFire&src=tyah"
+1500500911985	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://twitter.com/search?q=%23WhittierFire&src=tyah"
+1500500911986	Marionette	DEBUG	Received DOM event "pageshow" for "https://twitter.com/search?q=%23WhittierFire&src=tyah"
+1500500911986	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://twitter.com/search?q=%23WhittierFire&src=tyah"
+1500500911987	Marionette	DEBUG	Received DOM event "pageshow" for "https://twitter.com/search?q=%23WhittierFire&src=tyah"
+1500500911988	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://twitter.com/search?q=%23WhittierFire&src=tyah"
+1500500911988	Marionette	DEBUG	Received DOM event "pageshow" for "https://twitter.com/search?q=%23WhittierFire&src=tyah"
+1500500911988	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://twitter.com/search?q=%23WhittierFire&src=tyah"
+1500500911989	Marionette	DEBUG	Received DOM event "pageshow" for "https://twitter.com/search?q=%23WhittierFire&src=tyah"
+1500500911989	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://twitter.com/search?q=%23WhittierFire&src=tyah"
+1500500911990	Marionette	DEBUG	Received DOM event "pageshow" for "https://twitter.com/search?q=%23WhittierFire&src=tyah"
+1500500911990	Marionette	DEBUG	Received DOM event "DOMContentLoaded" for "https://twitter.com/search?q=%23WhittierFire&src=tyah"
+1500500911993	Marionette	DEBUG	Received DOM event "pageshow" for "https://twitter.com/search?q=%23WhittierFire&src=tyah"
+1500500913811	Marionette	DEBUG	Received DOM event "pageshow" for "https://twitter.com/search?q=%23WhittierFire&src=tyah"
+1500500924550	addons.productaddons	WARN	Failed downloading XML, status: 0, reason: error
+1500500926333	addons.productaddons	WARN	Failed downloading via XHR, status: 0, reason: error

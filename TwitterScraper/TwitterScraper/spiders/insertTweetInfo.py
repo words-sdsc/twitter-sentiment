@@ -1,6 +1,4 @@
 import sqlite3
-
-
 def insertTweetInfo( dbName, dataBaseLoc, tweetId, epoch, tweet, sent ):
     # Connect to specified DB
     conn = sqlite3.connect(dataBaseLoc)

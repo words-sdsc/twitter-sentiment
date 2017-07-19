@@ -53,7 +53,7 @@ class QuotesSpider(scrapy.Spider):
     # Method called after each scrapy request
     def parse(self, response):
         # Load page for selenium
-        self.driver.get(url)
+        self.driver.get('https://twitter.com/search?q=%23WhittierFire&src=tyah')
 
         # Scroll down the webpage via Selenium (infinite scrolling)
         for i in range(1,20):
