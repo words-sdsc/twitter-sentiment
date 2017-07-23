@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+
+<!-- Jquery import -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!-- Highcharts import -->
+<script src="http://code.highcharts.com/highcharts.js"></script>
+
+<script>
+var chart1; // globally available
+$(function () { 
+    var myChart = Highcharts.chart('container', {
+        chart: {
+            type: 'line'
+        },
+        title: {
+            text: 'Fruit Consumption'
+        },
+        xAxis: {
+            title: {
+            	text: 'Time'
+            }
+        },
+        yAxis: {
+            title: {
+                text: 'Sentiment'
+            }
+        },
+        series: [{
+            name: '#Whitier Fire',
+            data: {{tweetsList}}
+        }]
+    });
+});
+</script>
+<body>
+	<h1>Results page</h1>
+	<div id="container" style="width:100%; height:400px;"></div>
+	<p>
+		<ol>
+		{% for message in tweetsList %}
+    			<li class="tweets">{{ message }}</div>
+  		{% endfor %}
+  		</ol>
+	</p>
+</body>
+</html>
