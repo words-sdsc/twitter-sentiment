@@ -1,18 +1,21 @@
-from flask import Flask
+from flask import Flask, render_template
+from flask import request
+
+import time
+import json
+
 import sqlite3
 
 app = Flask(__name__)
 
-@app.route('/')
-def hello_world():
+@app.route('/', methods=['POST','GET'])
+def index():
     conn = sqlite3.connect('sql/TweetInfo.db')
 
-    cursor = conn.execute("SELECT * from TWEET_INFO_LOL")
-    dog = []
+    cursor = conn.execute("SELECT * from Test_run")
+    tweetsList = []
     for row in cursor:
-        print( row[2] )
-        dog.append(row[2])
-
-    return str(dog)
+        tweetsList.append(row[3])
+    return render_template("results.html", tweetsList=tweetsList)
     
 
