@@ -1,5 +1,6 @@
 # Scraping imports
 import scrapy
+import sqlite3
 from scrapy.selector import Selector
 from scrapy.http import HtmlResponse
 
@@ -19,14 +20,39 @@ from bs4 import BeautifulSoup
 import unittest, time, re
 import sys
 
+# Run scrapy from script
+from scrapy.crawler import CrawlerProcess
+
 # Local imports
-from insertTweetInfo import insertTweetInfo
+#from insertTweetInfo import insertTweetInfo
+
+sys.path.append("../../..")
+import settings
+from main import *
 
 SPIDER_NAME = "twitter"
 
 # Data base info
-dbLocation = "../../../sql/TweetInfo.db"
-dbName = "TWEET_INFO_LOL" 
+dbLocation = "sql/TweetInfo.db"
+dbTableName = "CORGIS"
+
+
+def insertTweetInfo( dbName, dataBaseLoc, tweetId, epoch, tweet, sent ):
+    # Connect to specified DB
+    c = sqlite3.connect(dataBaseLoc)
+    
+    print("Inserting tweet info")
+
+    # Insert a row of data
+    try:
+        c.execute("INSERT INTO " + dbName + " (ID, DATE, TWEET, SENTIMENT) \
+            VALUES ( ?, ?, ?, ? )", ( (tweetId, epoch, tweet, sent) ))
+        c.commit()   
+    except:
+        print("Error inserting into dataBase %s\nID for reference: %s" % dbName, tweetId)
+    
+    #c.close()
+
 
 class QuotesSpider(scrapy.Spider):
     name = SPIDER_NAME
@@ -43,7 +69,8 @@ class QuotesSpider(scrapy.Spider):
     # Begin making requests from select URLS
     def start_requests(self):
         urls = [
-            'https://twitter.com/search?q=%23WhittierFire&src=tyah',
+            #'https://twitter.com/search?q=%23WhittierFire&src=tyah',
+            'https://twitter.com/search?q=%23DetwilerFire&src=tyah&lang=en'
         ]
 
         # Make a request for each url to be parsed below
@@ -53,46 +80,69 @@ class QuotesSpider(scrapy.Spider):
     # Method called after each scrapy request
     def parse(self, response):
         # Load page for selenium
-        self.driver.get('https://twitter.com/search?q=%23WhittierFire&src=tyah')
 
-        # Scroll down the webpage via Selenium (infinite scrolling)
-        for i in range(1,20):
-            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(.5)
-        
-        # Get the raw HTML source after scrolling via selenium
-        raw_html = self.driver.page_source
-
-        # extract ALL the innerHTML for each tweet
-        soup = BeautifulSoup(raw_html, 'html.parser')
-        tweetTextsList = soup.find_all("div", {"class":"js-tweet-text-container"})
-        tweetDateList = soup.find_all("span", {"class":"_timestamp js-short-timestamp "})
-
-        # Grab ALL tag with attr 'data-tweet-id'
-        tweetIdTagList = soup.find_all(attrs={'data-tweet-id' : True}) 
-
-        # Create list of containing all tweet ids
-        tweetIdList = []
-        for tweetId in tweetIdTagList:
-            tweetIdList.append(tweetId['data-tweet-id'])
-        
-        # Grab all the exact unix-format times
-        unixTimesTagList = soup.find_all(attrs={'data-time' : True})
-        
-        # Add all unix times
-        unixTimesList = []
-        for timeStamp in unixTimesTagList:
-            unixTimesList.append(timeStamp['data-time'])
-                
-
-        # Write down db info
-        for tweet, tweetId, unixTime in zip(tweetTextsList, tweetIdList, unixTimesList):
-            tweet = ''.join(tweet.findAll(text=True))
-            tweet = tweet.replace('\n', '')
-            tweetId = str(tweetId)
-            unixTime = str(unixTime)
+        #self.driver.get(response.url)
+        print( "URL IS : %s " % getUrlQuery() )
+        self.driver.get( getUrlQuery() )
+        try:
+            # Scroll down the webpage via Selenium (infinite scrolling)
+            for i in range(1,20):
+                self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                time.sleep(.5)
             
-            # Insert information to DB
-            insertTweetInfo( dbName, dbLocation, tweetId, unixTime, tweet, -1 )
-        
-        self.driver.close() # Close web page
+            # Get the raw HTML source after scrolling via selenium
+            raw_html = self.driver.page_source
+
+            # extract ALL the innerHTML for each tweet
+            soup = BeautifulSoup(raw_html, 'html.parser')
+            tweetTextsList = soup.find_all("div", {"class":"js-tweet-text-container"})
+            tweetDateList = soup.find_all("span", {"class":"_timestamp js-short-timestamp "})
+
+            # Grab ALL tag with attr 'data-tweet-id'
+            tweetIdTagList = soup.find_all(attrs={'data-tweet-id' : True}) 
+
+            # Create list of containing all tweet ids
+            tweetIdList = []
+            for tweetId in tweetIdTagList:
+                tweetIdList.append(tweetId['data-tweet-id'])
+            
+            # Grab all the exact unix-format times
+            unixTimesTagList = soup.find_all(attrs={'data-time' : True})
+            
+            # Add all unix times
+            unixTimesList = []
+            for timeStamp in unixTimesTagList:
+                unixTimesList.append(timeStamp['data-time'])
+            
+            print( len(tweetTextsList) )
+            print( len(tweetIdList) )
+            print( len(unixTimesList) )
+
+            # Write down db info
+            for tweet, tweetId, unixTime in zip(tweetTextsList, tweetIdList, unixTimesList):
+                tweet = ''.join(tweet.findAll(text=True))
+                tweet = tweet.replace('\n', '')
+                tweetId = str(tweetId)
+                unixTime = str(unixTime)
+
+                print( dbTableName )
+                print( dbLocation )
+                print( tweetId )
+                print( unixTime )
+                print( tweet )
+
+                # Insert information to DB
+                insertTweetInfo( dbTableName, dbLocation, tweetId, unixTime, tweet, -1 )
+            
+            self.driver.close() # Close web page
+        except:
+            self.driver.close()
+
+def startCrawler():
+    process = CrawlerProcess({
+        'USER_AGENT': 'Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)'
+    })
+
+    process.crawl(QuotesSpider)
+    process.start()
+
