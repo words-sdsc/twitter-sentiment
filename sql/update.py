@@ -1,18 +1,21 @@
 import sqlite3
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from nltk import tokenize
 from random import randint
 
 
 
-#conn = sqlite3.connect('TweetInfo.db')
+conn = sqlite3.connect('TweetInfo.db')
 
-str_ = "Test_run"
+dbLoc = "TweetInfo.db"
+tableName = "_H_UNITEDAIRLINES"
+conn = sqlite3.connect(dbLoc)
 
-# update a row of data
-conn.execute("UPDATE " + str_ + " set SENTIMENT = ? where ID = ?")
+# Update into DB
+conn.execute("DROP TABLE " + tableName )
 
-# Save (commit) the changes
 conn.commit()
-
+conn.close()
 
 # We can also close the connection if we are done with it.
 # Just be sure any changes have been committed or they will be lost.
