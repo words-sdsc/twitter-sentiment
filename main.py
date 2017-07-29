@@ -3,15 +3,15 @@ import sqlite3
 
 import settings
 from TwitterScraper.TwitterScraper.spiders.searchMiner import *
+from SentimentAnalysis.cleanTweets import *
+from SentimentAnalysis.sentimentAnalysis import *
+
 #from settings import *
 # Main driver for the program
 
 index = 0
-searchQuery = ""
-dbName = "sql/TweetInfo.db"
+dbLoc = "sql/TweetInfo.db"
 urlQuery = ""
-tableName = ""
-
 
 settings.init()
 
@@ -19,37 +19,38 @@ settings.init()
 # Helper methods
 #
 def urlify( string ):
-    string.replace(" ", "%20")
+    string = string.replace(" ", "%20")
+    string = string.replace("#", "%23")
     baseURL = "https://twitter.com/search?q="
     baseURL += string
 
     return baseURL
 
 def tablify( string ):
-    string.replace("\n","")
-    string.replace(" ","_")
+    string = string.replace("\n","")
+    string = string.replace(" ","_")
+    string = string.replace("#","_H_")
     return string.upper()
 
 def getTableName():
-    return tableName
-
+    return settings.tableName
 def getUrlQuery():
     return settings.url
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     #
     # Get user search query
     #
     while(True):
-        searchQuery = input("What search query would you like to track?\n")
-        confirm = input("Is this query: \"%s\" correct? (y/n): " % searchQuery)
+        settings.searchQuery = input("What search query would you like to track?\n")
+        confirm = input("Is this query: \"%s\" correct? (y/n): " % settings.searchQuery)
 
         # Confirm user search query
         if confirm == "y" or confirm == "Y":
-            settings.url = urlify( searchQuery )
-            tableName = tablify( searchQuery ) 
+            settings.url = urlify( settings.searchQuery )
+            settings.tableName = tablify( settings.searchQuery ) 
 
-            print("Table name is: %s" % tableName)
+            print("Table name is: %s" % settings.tableName)
             confirm = input("Does this look correct? (y/n): ")
             
             # Confirm generated table name
@@ -62,7 +63,7 @@ if __name__ == '__main__':
 
     conn = sqlite3.connect("sql/TweetInfo.db")
 
-    print( tableName )
+    print( settings.tableName )
     conn = conn.cursor()
     try:
         # Create table
@@ -70,16 +71,15 @@ if __name__ == '__main__':
                  (ID            INT PRIMARY KEY UNIQUE  NOT NULL,
                  DATE           INT                     NOT NULL,
                  TWEET          CHAR(250)               NOT NULL,
-                 SENTIMENT      REAL);''' % tableName)
+                 SENTIMENT      REAL);''' % settings.tableName)
 
     except:
-        print("Table: %s already exists in Database: %s" % (tableName, dbName) )  
+        print("Table: %s already exists in Database: %s" % (settings.tableName, dbLoc) )  
 
     conn.close()
 
-    print( "URL ISISISISIS: %s " % getUrlQuery() )
-    #
     # Deploy scrapy crawler
-    #
-    #os.system(' cd TwitterScraper/TwitterScraper/spiders && scrapy crawl twitter')
     startCrawler()
+
+    # Update the sentiment
+    updateSentiment(dbLoc, getTableName())
