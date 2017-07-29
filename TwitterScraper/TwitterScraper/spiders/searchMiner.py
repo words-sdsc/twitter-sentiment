@@ -34,7 +34,7 @@ SPIDER_NAME = "twitter"
 
 # Data base info
 dbLocation = "sql/TweetInfo.db"
-dbTableName = "CORGIS"
+dbTableName = getTableName()
 
 
 def insertTweetInfo( dbName, dataBaseLoc, tweetId, epoch, tweet, sent ):
@@ -61,6 +61,7 @@ class QuotesSpider(scrapy.Spider):
     def __init__(self):
         """ Set up selenium driver """
         self.driver = webdriver.Firefox()
+        #self.driver = webdriver.PhantomJS()
         self.driver.implicitly_wait(30)
         self.base_url = "https://twitter.com"
         self.verificationErrors = []
@@ -86,7 +87,7 @@ class QuotesSpider(scrapy.Spider):
         self.driver.get( getUrlQuery() )
         try:
             # Scroll down the webpage via Selenium (infinite scrolling)
-            for i in range(1,20):
+            for i in range(1,150):
                 self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(.5)
             
@@ -125,14 +126,14 @@ class QuotesSpider(scrapy.Spider):
                 tweetId = str(tweetId)
                 unixTime = str(unixTime)
 
-                print( dbTableName )
+                print( getTableName() )
                 print( dbLocation )
                 print( tweetId )
                 print( unixTime )
                 print( tweet )
 
                 # Insert information to DB
-                insertTweetInfo( dbTableName, dbLocation, tweetId, unixTime, tweet, -1 )
+                insertTweetInfo( getTableName(), dbLocation, tweetId, unixTime, tweet, -1 )
             
             self.driver.close() # Close web page
         except:
