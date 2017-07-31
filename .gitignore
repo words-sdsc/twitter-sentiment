@@ -2,4 +2,5 @@
 .DS_Store
 geckodriver.log
 TwitterScraper/TwitterScraper/spiders/geckodriver.log
+ghostdriver.log
 __pycache__
