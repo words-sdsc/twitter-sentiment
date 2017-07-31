@@ -4,133 +4,46 @@
 	<meta charset="UTF-8">
 	<title>Document</title>
 </head>
+<link rel="stylesheet" href="{{ url_for('static', filename='result_styles.css') }}">
 
-<!-- Jquery import -->
+<!-- Jquery import 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<!-- Highcharts import -->
+ Highcharts import 
 <script src="http://code.highcharts.com/highcharts.js"></script>
 
-<!-- POLYNOMIAL REGRESSION -->
+ POLYNOMIAL REGRESSION 
 <script src="http://code.highcharts.com/modules/exporting.js"></script>
 <script src="//rawgithub.com/phpepe/highcharts-regression/master/highcharts-regression.js?8"></script>
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
 
-<script>
-$(function() {
-  $('#container').highcharts({
-    chart: {
-      type: 'scatter',
-      zoomType: 'xy'
-    },
-    title: {
-      text: 'Sentiment Over Time ({{table_choice}})'
-    },
-    subtitle: {
-      text: 'Made with <3'
-    },
-    xAxis: {
-      title: {
-        enabled: true,
-        text: 'Time (ms)'
-      },
-        dateTimeLabelFormats: {
-            second: '%Y-%m-%d<br/>%H:%M:%S',
-            minute: '%Y-%m-%d<br/>%H:%M',
-            hour: '%Y-%m-%d<br/>%H:%M',
-            day: '%Y<br/>%m-%d',
-            week: '%Y<br/>%m-%d',
-            month: '%Y-%m',
-            year: '%Y'
-        },
-      startOnTick: true,
-      endOnTick: true,
-      showLastLabel: true
-    },
-    yAxis: {
-      title: {
-        text: 'Sentiment'
-      }
-    },
-    legend: {
-      layout: 'vertical',
-      align: 'left',
-      verticalAlign: 'top',
-      x: 100,
-      y: 70,
-      floating: true,
-      backgroundColor: '#FFFFFF',
-      borderWidth: 1
-    },
-    plotOptions: {
-      scatter: {
-        marker: {
-          radius: 5,
-          states: {
-            hover: {
-              enabled: true,
-              lineColor: 'rgb(100,100,100)'
-            }
-          }
-        },
-        states: {
-          hover: {
-            marker: {
-              enabled: false
-            }
-          }
-        }
-      }
-    },
-    series: [{
-      // Display Linear Regression
-      regression: true,
-      
-      // Title of Each Point
-      name: 'Sentiment',
+ USE THIS LATER FOR DOUBLE GRAPH... 
+ http://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/area-basic/ -->
 
-      // Change colors based on POSITIVE, NEGATIVE, NEUTRAL
-      zones: [
-        {
-            // Negatie - Red
-            value: -5,
-            color: 'rgba(247, 46, 70, .5)' 
-        }, {
-            // Neutral - Blue
-            value: 5,
-            color: 'rgba(81, 185, 255, .5)'
-        }, {
-            // Positive - Green
-            color: 'rgba(48, 229, 81, .5)'
-        }
-      ],
+<!--  <script src="http://code.highcharts.com/highcharts.js"></script>
+ --><!-- <script src="http://code.highcharts.com/modules/exporting.js"></script>
+ -->
+<!--  <script src="//rawgithub.com/phpepe/highcharts-regression/master/highcharts-regression.js?8"></script> -->
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
 
-
-      pointInterval: 86400000,
-
-      // Pointer description
-      pointDescriptionFormatter: function() {
-        return 'The value for <b>' + this.x + '</b> is <b>' + this.y + '</b>, in series '+ this.series.name;
-    },
-
-        data: {{ tweetsList }} 
-
-
-
-    }]
-  });
-}); 
-</script>
-<!-- USE THIS LATER FOR DOUBLE GRAPH... -->
-<!-- http://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/area-basic/ -->
+<!-- Link chart display function: displayChart(data) -->
+<script type="text/javascript" src="{{ url_for('static', filename='displayChart.js') }}"> </script>
+<script type="text/javascript" src="{{ url_for('static', filename='displayStock.js') }}"> </script>
 
 <body>
 	<h1>Results page</h1>
     <h1>{{table_choice}}</h1>
-	<div id="container" style="width:100%; height:400px;"></div>
+    <div id="container"></div>
+
+    <button id="large">Large</button>
+    <button id="small">Small</button>
+    <button id="auto">Auto</button></body>
+
+    <ol>
 		{% for name in tableNamesList %}
     			<li class="tweets">{{ name }}</div>
   		{% endfor %}
-  		</ol>
+  	</ol>
 
 	<p>
 		<ol>
@@ -140,4 +53,8 @@ $(function() {
   		</ol>
 	</p>
 </body>
+
+<script type="text/javascript"> displayChart({{tweetsList}}); </script>
+
+
 </html>
