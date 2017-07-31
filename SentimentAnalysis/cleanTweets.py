@@ -1,7 +1,7 @@
 import re
 import sys
 
-def cleanTweets( tweet ):
+def cleanTweet( tweet ):
     return tokenize(tweet)
 
 import sys
