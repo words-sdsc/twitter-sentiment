@@ -1,84 +1,66 @@
-function displayStock(data) {
-    // $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=aapl-c.json&callback=?', function (data) {
+function displayStock(idName, tableName, dataT) {
+$.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=aapl-c.json&callback=?', function (data) {
 
-        // Create the chart
-        var chart = Highcharts.stockChart('container', {
+    // Create the chart
+    Highcharts.stockChart('container2', {
 
-            chart: {
-                height: 400
-            },
+        // Range of display for data.. e.g. 1day, 4months, 13months
+        rangeSelector: {
+            selected: 4
+        },
 
-            title: {
-                text: 'Highstock Responsive Chart'
-            },
+        // Graph Title
+        title: {
+            text: 'AAPL Stock Price'
+        },
+
+        // xAXis Attributes
         xAxis: {
           title: {
             enabled: true,
             text: 'Date'
           },
           type: 'datetime',
-            dateTimeLabelFormats: {
-                second: '%Y-%m-%d<br/>%H:%M:%S',
-                minute: '%Y-%m-%d<br/>%H:%M',
-                hour: '%Y-%m-%d<br/>%H:%M',
-                day: '%Y<br/>%m-%d',
-                week: '%Y<br/>%m-%d',
-                month: '%Y-%m',
-                year: '%Y'
-            },
           startOnTick: true,
           endOnTick: true,
           showLastLabel: true
         },
-            subtitle: {
-                text: 'Click small/large buttons or change window size to test responsiveness'
-            },
 
-            rangeSelector: {
-                selected: 1
-            },
+        // Plot options to average the data points
+        plotOptions: {
+            series: {
+                // Average plots by day
+                dataGrouping: {
+                    forced: true,
+                    units: [
+                        ['day', [1]]
+                    ]
+                },
 
-            series: [{
-                name: 'AAPL Stock Price',
-                data: {{tweetsList}},
-                type: 'area',
-                threshold: null,
-                tooltip: {
-                    valueDecimals: 2
-                }
-            }],
-
-            responsive: {
-                rules: [{
-                    condition: {
-                        maxWidth: 500
-                    },
-                    chartOptions: {
-                        chart: {
-                            height: 300
-                        },
-                        subtitle: {
-                            text: null
-                        },
-                        navigator: {
-                            enabled: false
+                // Execute JS onClick
+                point: {
+                    events: {
+                        click: function() {
+                            alert('Hello!2');
+                            console.log(this);
                         }
                     }
-                }]
+                }
             }
-        });
+        },
 
-
-        $('#small').click(function () {
-            chart.setSize(400);
-        });
-
-        $('#large').click(function () {
-            chart.setSize(800);
-        });
-
-        $('#auto').click(function () {
-            chart.setSize(null);
-        });
-    // });
+        series: [{
+            name: 'Cato',
+            data: dataT,
+            marker: {
+                enabled: true,
+                radius: 3
+            },
+            shadow: true,
+            tooltip: {
+                valueDecimals: 2
+            }
+        }]
+    });
+});
 }
