@@ -1,31 +1,32 @@
-function displayChart(chartData) {
+/**
+ * Displays line chart on the web browser.
+ * Param: idName - ID of tag that will be the chart's container
+ *        title - Name of the SQL table chosen, (Graph Title)
+ *        chartData - Array containing all the plot points of the chart
+ *                    where each element = [plot.x (time), plot.y (sentiment)]
+ */
+function displayChart(idName, title, chartData) {
+  // JQUERY Method to start up highcharts
   $(function() {
-    $('#container').highcharts({
+    $(idName).highcharts({
+      // Declare chart type and basic information
       chart: {
         type: 'scatter',
         zoomType: 'xy'
       },
       title: {
-        text: 'Sentiment Over Time ({{table_choice}})'
+        text: 'Sentiment Over Time ' + title
       },
       subtitle: {
         text: 'Made with <3'
       },
+
+      // Set up xAxis Attributes
       xAxis: {
         title: {
           enabled: true,
           text: 'Date'
         },
-        type: 'datetime',
-          dateTimeLabelFormats: {
-              second: '%Y-%m-%d<br/>%H:%M:%S',
-              minute: '%Y-%m-%d<br/>%H:%M',
-              hour: '%Y-%m-%d<br/>%H:%M',
-              day: '%Y<br/>%m-%d',
-              week: '%Y<br/>%m-%d',
-              month: '%Y-%m',
-              year: '%Y'
-          },
         startOnTick: true,
         endOnTick: true,
         showLastLabel: true
@@ -65,12 +66,6 @@ function displayChart(chartData) {
             }
           }
         },
-
-        series: {
-          dateGrouping: {
-              approximation: 'average',
-          }
-        }
       },
 
       series: [{
