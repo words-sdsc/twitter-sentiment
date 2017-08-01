@@ -3,4 +3,6 @@
 geckodriver.log
 TwitterScraper/TwitterScraper/spiders/geckodriver.log
 ghostdriver.log
+sql/print.py
+print.py
 __pycache__
