@@ -8,7 +8,7 @@ from random import randint
 conn = sqlite3.connect('TweetInfo.db')
 
 dbLoc = "TweetInfo.db"
-tableName = "_H_UNITEDAIRLINES"
+tableName = "_H_OAKLANDHILLSFIRE_OR__H_GRIZZLYPEAKFIRE_OR__H_GRIZZLYPEAK_FIRE"
 conn = sqlite3.connect(dbLoc)
 
 # Update into DB
