@@ -23,6 +23,7 @@ function displayChart(idName, title, chartData) {
 
       // Set up xAxis Attributes
       xAxis: {
+        type: 'datetime',
         title: {
           enabled: true,
           text: 'Date'
@@ -49,6 +50,9 @@ function displayChart(idName, title, chartData) {
 
       plotOptions: {
         scatter: {
+          // Allows for dictionary format despite high data amount > 1000
+          turboThreshold: 0,
+
           marker: {
             radius: 5,
             states: {
@@ -66,11 +70,28 @@ function displayChart(idName, title, chartData) {
             }
           }
         },
+        series: {
+                point: {
+                    events: {
+                        click: function() {
+                            alert('Hello!2');
+                            console.log("This x = " + this.x);
+                            console.log("This y = " + this.y)
+                            console.log("This tweetID = " + this.tweetId);
+                            console.log("This tweetText = " + this.tweetText)
+                        }
+                    }
+                }
+        }
       },
 
       series: [{
         // Display Linear Regression
         regression: true,
+        regressionSettings: {
+            type: 'polynomial',
+            color:  'rgba(229, 70, 52, .7)'
+        },
         
         // Title of Each Point
         name: 'Sentiment',
