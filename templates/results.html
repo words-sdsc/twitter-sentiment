@@ -4,38 +4,26 @@
 	<meta charset="UTF-8">
 	<title>Document</title>
 </head>
-<link rel="stylesheet" href="{{ url_for('static', filename='result_styles.css') }}">
 
-<!-- Jquery import 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
- Highcharts import 
-<script src="http://code.highcharts.com/highcharts.js"></script>
-
- POLYNOMIAL REGRESSION 
-<script src="http://code.highcharts.com/modules/exporting.js"></script>
-<script src="//rawgithub.com/phpepe/highcharts-regression/master/highcharts-regression.js?8"></script>
-
- USE THIS LATER FOR DOUBLE GRAPH... 
- http://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/area-basic/ -->
-
-<!--  <script src="http://code.highcharts.com/highcharts.js"></script>
- --><!-- <script src="http://code.highcharts.com/modules/exporting.js"></script>
- -->
-<!--  <script src="//rawgithub.com/phpepe/highcharts-regression/master/highcharts-regression.js?8"></script> -->
-
+<!-- Basic scripts for highcharts API -->
 <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script src="https://code.highcharts.com/stock/highstock.js"></script>
-
-<!--  -->
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+<!-- Scripts for linear regression -->
+<script src="//rawgithub.com/phpepe/highcharts-regression/master/highcharts-regression.js"> </script>
 
 
 <!-- Link chart display function: displayChart(data) -->
 <script type="text/javascript" src="{{ url_for('static', filename='displayChart.js') }}"> </script>
 <script type="text/javascript" src="{{ url_for('static', filename='displayStock.js') }}"> </script>
 
+<!-- Styles -->
+<link rel="stylesheet" href="{{ url_for('static', filename='result_styles.css') }}">
+
+
 <body>
-	<h1>Results page</h1>
+	<h1 id=resultsTitle>Results page</h1>
     <h1>{{ table_choice }}</h1>
     
     <h1>HIGH CHARTS #1</h1>
@@ -63,8 +51,8 @@
 	</p>
 </body>
 
-<script type="text/javascript"> displayChart("#container", "{{table_choice}}", {{ tweetsList }} ); </script>
-<script type="text/javascript"> displayStock("#container2", "{{table_choice}}", {{ tweetsList}}); </script>
+<script type="text/javascript"> displayChart("#container", "{{table_choice}}", {{ tweetsList | safe}} ); </script>
+<script type="text/javascript"> displayStock("container2", "{{table_choice}}", {{ tweetsList | safe}}); </script>
 
 
 </html>
