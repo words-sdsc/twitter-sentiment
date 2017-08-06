@@ -28,16 +28,34 @@ def results():
         # Select chosen table
         cursor = conn.execute("SELECT * FROM " + str(table_choice[2:-3]))
 
+        # Format data for highCharts
         tweetsList = []
-        index = 0
+        index = -1
         for row in cursor:
-            tweetsList.append([row[1]*1000, 100*row[3]])
             index += 1
+
+            # Ignore the highlighted tweets
+            #if(index < 20 and len(row) > 150): continue
+
+            timeMS = row[1] * 1000      # Micro -> MiliSeconds
+            sentiment = row[3] * 100   
+            tweetId = row[0]
+            tweetsList.append({ 'x': timeMS, 
+                                'y' : sentiment, 
+                                'tweetId' : tweetId,
+                                'tweetText' : row[2]})
+
+
+            #tweetsList.append([timeMS, sentiment])
+
 
         # Must sort becuase tweets can come out of order. FIXME Fix this at an earlier
         # part
-        tweetsList.sort()
-        #tweetsList.reverse()
+
+        print(tweetsList)
+        tweetsList = sorted(tweetsList, key=lambda k: k['x'])
+        print(len(tweetsList))
+
 
         return render_template("results.html", tweetsList=tweetsList,\
                 table_choice=table_choice[2:-3])
