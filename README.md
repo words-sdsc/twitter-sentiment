@@ -15,3 +15,8 @@ In order to deploy the scrapy crawler directly... first cd into scrapy project "
 directory and type:
     
     scrapy crawl twitter
+
+# Built With
+- Flask - Lightweight python Web framework library
+- Selenium, Scrapy, BeautifulSoup - Used for scraping and parsing tweets)  
+- Highcharts - Displaying sentiment oer time
