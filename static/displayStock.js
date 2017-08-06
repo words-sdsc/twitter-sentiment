@@ -2,7 +2,7 @@ function displayStock(idName, tableName, dataT) {
 $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=aapl-c.json&callback=?', function (data) {
 
     // Create the chart
-    Highcharts.stockChart('container2', {
+    Highcharts.stockChart("container2", {
 
         // Range of display for data.. e.g. 1day, 4months, 13months
         rangeSelector: {
@@ -11,7 +11,7 @@ $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=aapl-c.jso
 
         // Graph Title
         title: {
-            text: 'AAPL Stock Price'
+            text: tableName
         },
 
         // xAXis Attributes
@@ -29,6 +29,9 @@ $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=aapl-c.jso
         // Plot options to average the data points
         plotOptions: {
             series: {
+                // Allows for dictionary format despite high data amount > 1000
+                turboThreshold: 0,
+
                 // Average plots by day
                 dataGrouping: {
                     forced: true,
@@ -42,7 +45,9 @@ $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=aapl-c.jso
                     events: {
                         click: function() {
                             alert('Hello!2');
-                            console.log(this);
+                            console.log("This x = " + this.x);
+                            console.log("This y = " + this.y)
+                            console.log("This tweetID = " + this.tweetId);
                         }
                     }
                 }
@@ -51,6 +56,13 @@ $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=aapl-c.jso
 
         series: [{
             name: 'Cato',
+            // Set up regression line
+            regression: true,
+            regressionSettings: {
+                    type: 'polynomial',
+                    color:  'rgba(229, 70, 52, .7)'
+            },
+
             data: dataT,
             marker: {
                 enabled: true,
