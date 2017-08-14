@@ -1,4 +1,5 @@
 *.pyc
+keys.py
 .DS_Store
 geckodriver.log
 TwitterScraper/TwitterScraper/spiders/geckodriver.log
