@@ -9,12 +9,28 @@ import sqlite3
 
 app = Flask(__name__)
 
+""" Default home page.
+
+Allows user to choose a table to display or view a live stream of a 
+pre-determiend query.
+
+"""
 @app.route('/', methods=['GET'])
 def index():
     conn = sqlite3.connect('sql/TweetInfo.db')
-    tableNamesList = conn.execute("select name from sqlite_master where type = 'table'")
+
+    # Grab list of table names
+    tableNamesList = conn.execute("select name from sqlite_master where type = "
+                                    "'table'")
+
     return render_template("index.html", tableNamesList=tableNamesList)
 
+""" Page with graphs of user-specified table.
+
+Results page that shows graphs of a specified query. The page is generated based
+on user table choice (POST requet). 
+
+"""
 @app.route('/results', methods=['POST','GET'])
 def results():
     # Dispaly results
@@ -35,7 +51,7 @@ def results():
             index += 1
 
             # Ignore the highlighted tweets
-            #if(index < 20 and len(row) > 150): continue
+            if(index < 20 and len(row) > 150): continue
 
             timeMS = row[1] * 1000      # Micro -> MiliSeconds
             sentiment = row[3] * 100   
@@ -43,24 +59,28 @@ def results():
             tweetsList.append({ 'x': timeMS, 
                                 'y' : sentiment, 
                                 'tweetId' : tweetId,
-                                'tweetText' : row[2]})
+                                'tweetText' : row[2]
+                             })
 
-
-            #tweetsList.append([timeMS, sentiment])
-
-
-        # Must sort becuase tweets can come out of order. FIXME Fix this at an earlier
-        # part
-
-        print(tweetsList)
+        # FIXME do this sorting later
+        # Must sort, tweets can be scraped out of order. 
         tweetsList = sorted(tweetsList, key=lambda k: k['x'])
-        print(len(tweetsList))
 
 
-        return render_template("results.html", tweetsList=tweetsList,\
+        return render_template("results.html", tweetsList=tweetsList,
                 table_choice=table_choice[2:-3])
     except:
         return render_template("error.html")
+
+""" Streaming page with live graph.
+
+Displays a live graph of sentiment over time with a pre-determined selection of
+search queries. (Typically updated with trending tweets)
+
+"""
+@app.route('/stream', methods=['POST','GET'])
+def stream():
+    print("Streaming!")
 
 # Starts up the webserver
 if __name__ == "__main__":
