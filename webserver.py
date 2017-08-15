@@ -78,9 +78,9 @@ Displays a live graph of sentiment over time with a pre-determined selection of
 search queries. (Typically updated with trending tweets)
 
 """
-@app.route('/stream', methods=['POST','GET'])
+@app.route('/streaming', methods=['POST','GET'])
 def stream():
-    print("Streaming!")
+    return render_template("streaming.html")
 
 # Starts up the webserver
 if __name__ == "__main__":
