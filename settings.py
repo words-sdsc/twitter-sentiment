@@ -5,3 +5,6 @@ def init():
     tableName = ""
     global searchQuery
     searchQuery = ""
+
+    global tweetListBuffer
+    tweetListBuffer = []
