@@ -1,13 +1,30 @@
-from flask import Flask, render_template
-from datetime import datetime
-from flask import request
+from flask import Flask, render_template, request
 
+
+from datetime import datetime
 import time
 import json
-
 import sqlite3
 
+
+from threading import Lock
+
+from flask_socketio import SocketIO, emit, join_room, leave_room, close_room, rooms, disconnect
+import settings
+import streaming
+
+
+
+test_arr = []
+
+async_mode = None
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app, async_mode=async_mode)
+
+thread1 = None
+thread2 = None
+thread_lock = Lock()
 
 """ Default home page.
 
@@ -80,8 +97,46 @@ search queries. (Typically updated with trending tweets)
 """
 @app.route('/streaming', methods=['POST','GET'])
 def stream():
-    return render_template("streaming.html")
+    return render_template("streaming.html", async_mode=socketio.async_mode)
+
+
+def background_thread1():
+    """Example of how to send server generated events to clients."""
+    count = 0
+    streaming.start(socketio)
+    """
+    while True:
+        socketio.sleep(5)
+        print("Emited response")
+        count += 1
+
+        for tweet in settings.tweetListBuffer:
+            socketio.emit('my_response',
+                          {'data': tweet, 'count': count},
+                          namespace='/test')
+    """
+
+
+def work(tweet, count):
+    socketio.emit('my_response',
+          {'data': str(tweet), 'count': count},
+          namespace='/test')
+
+@socketio.on('connect', namespace='/test')
+def test_connect():
+    global thread1
+    with thread_lock:
+        print("Starting thread 1")
+        if thread1 is None:
+            thread1 = socketio.start_background_task(target=background_thread1)
+
+    emit('my_response', {'data': 'Connected', 'count': 0})
+
+#
+# Socket messages
+#
 
 # Starts up the webserver
 if __name__ == "__main__":
-    app.run()
+    print("Running server...")
+    socketio.run(app)
