@@ -8,6 +8,8 @@ import json
 import settings
 import sqlite3
 
+from SentimentAnalysis.sentimentAnalysis import *
+
 from flask_socketio import SocketIO, emit, join_room, leave_room, close_room, rooms, disconnect
 
 def start(socketio):
@@ -24,6 +26,7 @@ def start(socketio):
                 # Loads for a stirng, load for an object file
                 json_obj = json.loads(data)  
                 info = ""
+                sent = 0
 
                 # Selects value of name of lsit user of obj jsonObj
                 info +=  json_obj['user']['name']
@@ -31,10 +34,20 @@ def start(socketio):
                 info += json_obj['text']
                 info += "\n on " + json_obj['created_at'] + "\n"
                 settings.tweetListBuffer.append(json_obj['text'])
+
+                # Collect info
+                #date = json_obj['created_at']
+
+                #sent = getSentiment(json_obj['text'])
                 
+                # Must have socket sleep to return info
                 socketio.sleep(.5)
+
+                # Send information of tweets through socket 
                 socketio.emit('my_response',
-                              {'data': json_obj['text'], 'count': 0},
+                              {'data': json_obj['text'], 
+                              'count': 0,
+                              'sentiment': 0},
                               namespace='/test')
 
                 #print( info )
