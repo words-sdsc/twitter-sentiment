@@ -1,18 +1,17 @@
 from flask import Flask, render_template, request
 
-
 from datetime import datetime
 import time
 import json
 import sqlite3
 
-
+# Imports for Web Sockets
 from threading import Lock
-
 from flask_socketio import SocketIO, emit, join_room, leave_room, close_room, rooms, disconnect
+
+# Local Imports
 import settings
 import streaming
-
 
 
 test_arr = []
@@ -104,18 +103,6 @@ def background_thread1():
     """Example of how to send server generated events to clients."""
     count = 0
     streaming.start(socketio)
-    """
-    while True:
-        socketio.sleep(5)
-        print("Emited response")
-        count += 1
-
-        for tweet in settings.tweetListBuffer:
-            socketio.emit('my_response',
-                          {'data': tweet, 'count': count},
-                          namespace='/test')
-    """
-
 
 def work(tweet, count):
     socketio.emit('my_response',
@@ -130,7 +117,7 @@ def test_connect():
         if thread1 is None:
             thread1 = socketio.start_background_task(target=background_thread1)
 
-    emit('my_response', {'data': 'Connected', 'count': 0})
+    emit('my_response', {'data': 'Successfully Connected Socket', 'count': 0})
 
 #
 # Socket messages
