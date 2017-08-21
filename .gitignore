@@ -1,9 +1,9 @@
 *.pyc
 keys.py
 .DS_Store
-geckodriver.log
 TwitterScraper/TwitterScraper/spiders/geckodriver.log
-ghostdriver.log
 sql/print.py
 print.py
 __pycache__
+geckodriver.log
+ghostdriver.log
