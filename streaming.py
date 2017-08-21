@@ -38,7 +38,7 @@ def start(socketio):
                 # Collect info
                 #date = json_obj['created_at']
 
-                #sent = getSentiment(json_obj['text'])
+                sent = getSentiment(json_obj['text'])
                 
                 # Must have socket sleep to return info
                 socketio.sleep(.5)
@@ -47,7 +47,7 @@ def start(socketio):
                 socketio.emit('my_response',
                               {'data': json_obj['text'], 
                               'count': 0,
-                              'sentiment': 0},
+                              'sentiment': sent},
                               namespace='/test')
 
                 #print( info )
