@@ -17,6 +17,7 @@
 <!-- Link chart display function: displayChart(data) -->
 <script type="text/javascript" src="{{ url_for('static', filename='displayChart.js') }}"> </script>
 <script type="text/javascript" src="{{ url_for('static', filename='displayStock.js') }}"> </script>
+<script type="text/javascript" src="{{ url_for('static', filename='streaming.js') }}"> </script>
 
 <!-- Styles -->
 <link rel="stylesheet" href="{{ url_for('static', filename='result_styles.css') }}">
@@ -31,6 +32,9 @@
 
     <h1>HIGH STOCKS #1</h1>
     <div id="container2"></div>
+
+    <h1>Volume over Time #1</h1>
+    <div id="container3"></div>
 
     <button id="large">Large</button>
     <button id="small">Small</button>
@@ -53,6 +57,7 @@
 
 <script type="text/javascript"> displayChart("#container", "{{table_choice}}", {{ tweetsList | safe}} ); </script>
 <script type="text/javascript"> displayStock("container2", "{{table_choice}}", {{ tweetsList | safe}}); </script>
+<script type="text/javascript"> streaming("container3", "{{table_choice}}", {{ tweetsList | safe}}); </script>
 
 
 </html>

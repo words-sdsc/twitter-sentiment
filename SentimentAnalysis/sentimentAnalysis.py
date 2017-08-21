@@ -53,7 +53,7 @@ def tokenize1(text):
 ID_INDEX = 0
 TWEET_INDEX = 2
 
-def updateSentiment( dbLoc, tableName):
+def updateSentiment(dbLoc, tableName):
     sid = SentimentIntensityAnalyzer()
     conn = sqlite3.connect(dbLoc)
 
@@ -85,7 +85,28 @@ def updateSentiment( dbLoc, tableName):
     conn.commit()
     conn.close()
 
+def getSentiment(tweet):
+    tweet = cleanTweet(tweet)
+    sent = 0.0
+    count = 0
+    sentList = tokenize.sent_tokenize(text)
+
+    # Go through each sentence in tweet
+    for sentence in sentList:
+        count += 1
+        ss = sid.polarity_scores(sentence)
+        sent += ss['compound']  # Tally up the overall sentiment
+
+    if count != 0:
+        sent = float(sent / count)
+        
+    return sent
+
 # Update the sentiment
+"""
+TESTING CLEANER
+"""
+"""
 tweets = []
 tweets.append("RT @KirkKus: Indirect cost of the UK being in the EU is estimated to be costing Britain £170 billion per year! #BetterOffOut #UKIP")
 tweets.append("VIDEO: Sturgeon on post-election deals http://t.co/BTJwrpbmOY")
@@ -106,3 +127,4 @@ tweets.append("RT @scotnotbritt: Well thats it. LABOUR would rather have a TORY 
 for tweet in tweets:
     print("Old tweet: %s" % tweet)
     print("Cleaned tweet: %s\n" % cleanTweet(tweet))
+"""

@@ -74,7 +74,7 @@ function displayChart(idName, title, chartData) {
                 point: {
                     events: {
                         click: function() {
-                            alert('Hello!2');
+                            alert("Tweet Text:\n" + this.tweetText);
                             console.log("This x = " + this.x);
                             console.log("This y = " + this.y)
                             console.log("This tweetID = " + this.tweetId);
