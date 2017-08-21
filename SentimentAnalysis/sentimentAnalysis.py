@@ -86,10 +86,11 @@ def updateSentiment(dbLoc, tableName):
     conn.close()
 
 def getSentiment(tweet):
+    sid = SentimentIntensityAnalyzer()
     tweet = cleanTweet(tweet)
     sent = 0.0
     count = 0
-    sentList = tokenize.sent_tokenize(text)
+    sentList = tokenize.sent_tokenize(tweet)
 
     # Go through each sentence in tweet
     for sentence in sentList:
