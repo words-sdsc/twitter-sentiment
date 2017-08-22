@@ -17,7 +17,8 @@
 <!-- Link chart display function: displayChart(data) -->
 <script type="text/javascript" src="{{ url_for('static', filename='displayChart.js') }}"> </script>
 <script type="text/javascript" src="{{ url_for('static', filename='displayStock.js') }}"> </script>
-<script type="text/javascript" src="{{ url_for('static', filename='streaming.js') }}"> </script>
+<script type="text/javascript" src="{{ url_for('static', filename='displayVolume.js') }}"> </script>
+<script type="text/javascript" src="{{ url_for('static', filename='displayMirroredVolume.js') }}"> </script>
 
 <!-- Styles -->
 <link rel="stylesheet" href="{{ url_for('static', filename='result_styles.css') }}">
@@ -27,14 +28,19 @@
 	<h1 id=resultsTitle>Results page</h1>
     <h1>{{ table_choice }}</h1>
     
-    <h1>HIGH CHARTS #1</h1>
+    <h1>Display Chart</h1>
     <div id="container"></div>
 
-    <h1>HIGH STOCKS #1</h1>
+<!--     
+    <h1>Display Stocks</h1>
     <div id="container2"></div>
 
-    <h1>Volume over Time #1</h1>
+    <h1>Volume Over Time</h1>
     <div id="container3"></div>
+ -->
+    <h1>Volume Over Time #2</h1>
+    <div id="container4"></div>
+
 
     <button id="large">Large</button>
     <button id="small">Small</button>
@@ -43,21 +49,22 @@
     <ol>
 		{% for name in tableNamesList %}
     			<li class="tweets">{{ name }}</div>
-  		{% endfor %}
+  	{% endfor %}
   	</ol>
 
 	<p>
 		<ol>
 		{% for message in tweetsList %}
     			<li class="tweets">{{ message }}</div>
-  		{% endfor %}
-  		</ol>
+  	{% endfor %}
+  	</ol>
 	</p>
 </body>
 
 <script type="text/javascript"> displayChart("#container", "{{table_choice}}", {{ tweetsList | safe}} ); </script>
-<script type="text/javascript"> displayStock("container2", "{{table_choice}}", {{ tweetsList | safe}}); </script>
-<script type="text/javascript"> displayVolume("container3", "{{table_choice}}", {{ tweetsList | safe}}); </script>
+<!-- <script type="text/javascript"> displayStock("container2", "{{table_choice}}", {{ tweetsList | safe}}); </script>
+<script type="text/javascript"> displayVolume("container3", "{{table_choice}}", {{ tweetsList | safe}}); </script> -->
+<script type="text/javascript"> displayMirroredVolume("container4", "{{table_choice}}", {{ tweetsList | safe}}); </script>
 
 
 </html>

@@ -4,8 +4,133 @@
     <title>Flask-SocketIO Test</title>
     <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
+    
+	<!-- Basic scripts for highcharts API -->
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script src="https://code.highcharts.com/stock/highstock.js"></script>
+	<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
+        	var chart = Highcharts.chart('container', {
+		      // Declare chart type and basic information
+		      chart: {
+		        type: 'scatter',
+		        zoomType: 'xy'
+		      },
+		      title: {
+		        text: 'Sentiment Over Time '
+		      },
+		      subtitle: {
+		        text: 'Made with <3'
+		      },
+
+		      // Set up xAxis Attributes
+		      xAxis: {
+		        type: 'datetime',
+		        title: {
+		          enabled: true,
+		          text: 'Date'
+		        },
+		        startOnTick: true,
+		        endOnTick: true,
+		        showLastLabel: true
+		      },
+		      yAxis: {
+		        title: {
+		          text: 'Sentiment'
+		        }
+		      },
+		      legend: {
+		        layout: 'vertical',
+		        align: 'left',
+		        verticalAlign: 'top',
+		        x: 100,
+		        y: 70,
+		        floating: true,
+		        backgroundColor: '#FFFFFF',
+		        borderWidth: 1
+		      },
+
+		      plotOptions: {
+		        scatter: {
+		          // Allows for dictionary format despite high data amount > 1000
+		          turboThreshold: 0,
+
+		          marker: {
+		            radius: 5,
+		            states: {
+		              hover: {
+		                enabled: true,
+		                lineColor: 'rgb(100,100,100)'
+		              }
+		            }
+		          },
+		          states: {
+		            hover: {
+		              marker: {
+		                enabled: false
+		              }
+		            }
+		          }
+		        },
+		        series: {
+		                point: {
+		                    events: {
+		                        click: function() {
+		                            alert("Tweet Text:\n" + this.tweetText);
+		                            console.log("This x = " + this.x);
+		                            console.log("This y = " + this.y)
+		                            console.log("This tweetID = " + this.tweetId);
+		                            console.log("This tweetText = " + this.tweetText)
+		                        }
+		                    }
+		                }
+		        }
+		      },
+
+		      series: [{
+		        // Display Linear Regression
+		        regression: true,
+		        regressionSettings: {
+		            type: 'polynomial',
+		            color:  'rgba(229, 70, 52, .7)'
+		        },
+		        
+		        // Title of Each Point
+		        name: 'Sentiment',
+
+		        // Change colors based on POSITIVE, NEGATIVE, NEUTRAL
+		        zones: [
+		          {
+		              // Negatie - Red
+		              value: -5,
+		              color: 'rgba(247, 46, 70, .5)' 
+		          }, {
+		              // Neutral - Blue
+		              value: 5,
+		              color: 'rgba(81, 185, 255, .5)'
+		          }, {
+		              // Positive - Green
+		              color: 'rgba(48, 229, 81, .5)'
+		          }
+		        ],
+
+		        pointInterval: 86400000,
+
+		        // Pointer description
+		        pointDescriptionFormatter: function() {
+		          return 'The value for <b>' + this.x + '</b> is <b>' + this.y + '</b>, in series '+ this.series.name;
+		      },
+		          data: []
+		      }]
+		});
+
+
+
+
+
             // Use a "/test" namespace.
             // An application can open a connection on multiple namespaces, and
             // Socket.IO will multiplex all those connections on a single
@@ -30,6 +155,9 @@
             // section of the page.
             socket.on('my_response', function(msg) {
                 $('#log').append('<br>' + $('<div/>').text('Received #' + msg.sentiment + ': ' + msg.data).html());
+
+                // Dynamically add points to the first series
+				chart.series[0].addPoint(msg.sentiment * 100, true, false, true);
             });
 
             // Interval function that tests message latency by sending a "ping"
@@ -62,7 +190,7 @@
     <p>Async mode is: <b>{{ async_mode }}</b></p>
     <p>Average ping/pong latency: <b><span id="ping-pong"></span>ms</b></p>
     <h2>Send:</h2>
-
+	<div id="container" style="height: 400px"></div>
     <h2>Receive:</h2>
    	<h1>Live tweets of: streaming_chocie</h1>
     <div id="log"></div>

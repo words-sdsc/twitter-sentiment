@@ -121,5 +121,5 @@ function displayChart(idName, title, chartData) {
           data: chartData
       }]
     });
-  }); 
+  });
 }

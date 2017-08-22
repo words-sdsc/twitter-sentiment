@@ -1,6 +1,5 @@
 function displayVolume(idName, tableName, dataT) {
 $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=aapl-c.json&callback=?', function (data) {
-
     // Create the chart
     Highcharts.stockChart("container3", {
 
@@ -36,7 +35,10 @@ $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=aapl-c.jso
                 // Average plots by day
                 dataGrouping: {
                     forced: true,
+                    // Change the average plot to just be the volume of tweets in a day
                     approximation: function(arr) { return arr.length; },
+
+                    // Average by day
                     units: [
                         ['day', [1]]
                     ]
