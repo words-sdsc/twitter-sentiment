@@ -62,6 +62,8 @@ def results():
 
         # Format data for highCharts
         tweetsList = []
+        posData = []
+        negData = []
         index = -1
         for row in cursor:
             index += 1
@@ -78,6 +80,7 @@ def results():
                                 'tweetText' : row[2]
                              })
 
+
         # FIXME do this sorting later
         # Must sort, tweets can be scraped out of order. 
         tweetsList = sorted(tweetsList, key=lambda k: k['x'])
@@ -87,6 +90,7 @@ def results():
                 table_choice=table_choice[2:-3])
     except:
         return render_template("error.html")
+
 
 """ Streaming page with live graph.
 
