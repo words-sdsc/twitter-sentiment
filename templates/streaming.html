@@ -91,6 +91,35 @@
 		      },
 
 		      series: [{
+		        // Title of Each Point
+		        name: 'Sentiment',
+
+		        // Change colors based on POSITIVE, NEGATIVE, NEUTRAL
+		        zones: [
+		          {
+		              // Negatie - Red
+		              value: -5,
+		              color: 'rgba(247, 46, 70, .5)' 
+		          }, {
+		              // Neutral - Blue
+		              value: 5,
+		              color: 'rgba(81, 185, 255, .5)'
+		          }, {
+		              // Positive - Green
+		              color: 'rgba(48, 229, 81, .5)'
+		          }
+		        ],
+
+		        pointInterval: 86400000,
+
+		        // Pointer description
+		        pointDescriptionFormatter: function() {
+		          return 'The value for <b>' + this.x + '</b> is <b>' + this.y + '</b>, in series '+ this.series.name;
+		      },
+		          data: []
+		      },
+		      {	// Series dedicated for retweets
+
 		        // Display Linear Regression
 		        regression: true,
 		        regressionSettings: {
@@ -128,8 +157,16 @@
 		});
 
 
+        	$('#hideRetweets').click(function () {
+        		console.log("Hide retweets")
+    			chart.series[1].hide();
+			});
+			$('#showRetweets').click(function () {
+        		console.log("Show retweets")
+    			chart.series[1].show();
+			});
 
-
+        	/* Websockets */
 
             // Use a "/test" namespace.
             // An application can open a connection on multiple namespaces, and
@@ -155,9 +192,13 @@
             // section of the page.
             socket.on('my_response', function(msg) {
                 $('#log').append('<br>' + $('<div/>').text('Received #' + msg.sentiment + ': ' + msg.data).html());
-
+                console.log("Retweet: " + msg.retweet);
                 // Dynamically add points to the first series
-				chart.series[0].addPoint(msg.sentiment * 100, true, false, true);
+                if( msg.retweet ) {
+					chart.series[1].addPoint(msg.sentiment * 100, true, false, true);
+				} else {
+					chart.series[0].addPoint(msg.sentiment * 100, true, false, true);
+				}
             });
 
             // Interval function that tests message latency by sending a "ping"
@@ -191,6 +232,8 @@
     <p>Average ping/pong latency: <b><span id="ping-pong"></span>ms</b></p>
     <h2>Send:</h2>
 	<div id="container" style="height: 400px"></div>
+	<button id="hideRetweets">Hide Retweets</button>
+    <button id="showRetweets">Show Retweets</button>
     <h2>Receive:</h2>
    	<h1>Live tweets of: streaming_chocie</h1>
     <div id="log"></div>

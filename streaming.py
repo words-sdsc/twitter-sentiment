@@ -38,16 +38,25 @@ def start(socketio):
                 # Collect info
                 #date = json_obj['created_at']
 
-                sent = getSentiment(json_obj['text'])
-                
+                retweet = False
+                tweetText = json_obj['text']
+
+                if "RT @" in tweetText:
+                    retweet = True
+
+                tweetText = tweetText.replace("RT @", "")
+                sent = getSentiment(tweetText)
+
+
                 # Must have socket sleep to return info
                 socketio.sleep(.5)
 
                 # Send information of tweets through socket 
                 socketio.emit('my_response',
-                              {'data': json_obj['text'], 
+                              {'data': tweetText, 
                               'count': 0,
-                              'sentiment': sent},
+                              'sentiment': sent,
+                              'retweet' : retweet },
                               namespace='/test')
 
                 #print( info )
@@ -55,7 +64,7 @@ def start(socketio):
                 return True
 
             except Exception as e:
-                print( "ERROR" )
+                print( "ERROR", str(e) )
                 #print( 'failed ondata' , str(e) )
                 #return False
 
