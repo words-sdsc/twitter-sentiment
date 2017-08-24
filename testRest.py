@@ -12,6 +12,7 @@ import moment
 # Auth keys
 from keys import * 
 
+import sqlite3
 
 #Set up Twitter Authentication
 auth = tweepy.OAuthHandler(consumer_key(), consumer_secret())
@@ -51,20 +52,34 @@ def get_tweets(listOfTweets, keyword, numOfTweets):
         listOfTweets.append(dict_)   
     return listOfTweets
 
-statusList = api.statuses_lookup([897208601319690240])
-for status in statusList:
-    if 'quoted_status' in status._json:
-        print( "Retweet" )
-    else:
-        print( "Not retweet" )
-    #print(status.retweeted_status)
+# Connect to DB
+conn = sqlite3.connect('sql/TweetInfo.db')
+tableName = "_H_CORGIS"
 
-statusList = api.statuses_lookup([766964808885284864])
-for status in statusList:
-    # ._json is actually just a dictionary
-    ##print(json.dumps(status._json))
-    if 'quoted_status' in status._json:
+# Add new Column
+conn.execute("ALTER TABLE " + tableName + " ADD COLUMN RETWEET INT")
+
+# Get list of rows
+cursor = conn.execute("SELECT * FROM " + tableName) 
+
+index = 0
+# Update each row
+for row in cursor:
+    statusList = api.statuses_lookup([row[0]])
+
+    # Is a retweet
+    if (len(statusList) > 0 ) and ('quoted_status' in statusList[0]._json):
         print( "Retweet" )
+        # Update into DB
+        conn.execute("UPDATE " + tableName + " set RETWEET = ? where ID = ?", \
+                (1, row[0]))
+
+    # Not a retweet
     else:
-        print( "Not retweet" )
-    #print(status._json['retweeted_status')
+        print("Not Retweet")
+        conn.execute("UPDATE " + tableName + " set RETWEET = ? where ID = ?", \
+                (0, row[0]))
+    print()
+
+conn.commit()
+conn.close()
