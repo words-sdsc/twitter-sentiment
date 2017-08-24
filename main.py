@@ -15,10 +15,9 @@ urlQuery = ""
 
 settings.init()
 
-# 
-# Helper methods
-#
 def urlify( string ):
+    """
+    """
     string = string.replace(" ", "%20")
     string = string.replace("#", "%23")
     baseURL = "https://twitter.com/search?q="
