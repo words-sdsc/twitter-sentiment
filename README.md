@@ -8,7 +8,7 @@ are then displayed on a python webserver where the sentiment over time is displa
     python3 main.py
 
 ## Running the webserver
-    python3 webserver.py
+    python3 app.py
 
 ## How to Run Web Crawler Directly:
 In order to deploy the scrapy crawler directly... first cd into scrapy project "TwitterScraper/"
