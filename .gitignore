@@ -7,3 +7,4 @@ print.py
 __pycache__
 geckodriver.log
 ghostdriver.log
+.credentials
