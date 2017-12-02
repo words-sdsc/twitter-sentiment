@@ -1,242 +1,28 @@
 <!DOCTYPE HTML>
 <html>
-<head>
+  <head>
     <title>Flask-SocketIO Test</title>
     <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
-    
-	<!-- Basic scripts for highcharts API -->
-	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-	<script src="https://code.highcharts.com/stock/highstock.js"></script>
-	<script src="https://code.highcharts.com/modules/exporting.js"></script>
 
-
-    <script type="text/javascript" charset="utf-8">
-        $(document).ready(function() {
-        	var chart = Highcharts.chart('container', {
-		      // Declare chart type and basic information
-		      chart: {
-		        type: 'scatter',
-		        zoomType: 'xy'
-		      },
-		      title: {
-		        text: 'Sentiment Over Time '
-		      },
-		      subtitle: {
-		        text: 'Made with <3'
-		      },
-
-		      // Set up xAxis Attributes
-		      xAxis: {
-		        type: 'datetime',
-		        title: {
-		          enabled: true,
-		          text: 'Date'
-		        },
-		        startOnTick: true,
-		        endOnTick: true,
-		        showLastLabel: true
-		      },
-		      yAxis: {
-		        title: {
-		          text: 'Sentiment'
-		        }
-		      },
-		      legend: {
-		        layout: 'vertical',
-		        align: 'left',
-		        verticalAlign: 'top',
-		        x: 100,
-		        y: 70,
-		        floating: true,
-		        backgroundColor: '#FFFFFF',
-		        borderWidth: 1
-		      },
-
-		      plotOptions: {
-		        scatter: {
-		          // Allows for dictionary format despite high data amount > 1000
-		          turboThreshold: 0,
-
-		          marker: {
-		            radius: 5,
-		            states: {
-		              hover: {
-		                enabled: true,
-		                lineColor: 'rgb(100,100,100)'
-		              }
-		            }
-		          },
-		          states: {
-		            hover: {
-		              marker: {
-		                enabled: false
-		              }
-		            }
-		          }
-		        },
-		        series: {
-		                point: {
-		                    events: {
-		                        click: function() {
-		                            alert("Tweet Text:\n" + this.tweetText);
-		                            console.log("This x = " + this.x);
-		                            console.log("This y = " + this.y)
-		                            console.log("This tweetID = " + this.tweetId);
-		                            console.log("This tweetText = " + this.tweetText)
-		                        }
-		                    }
-		                }
-		        }
-		      },
-
-		      series: [{
-		        // Title of Each Point
-		        name: 'Sentiment',
-
-		        // Change colors based on POSITIVE, NEGATIVE, NEUTRAL
-		        zones: [
-		          {
-		              // Negatie - Red
-		              value: -5,
-		              color: 'rgba(247, 46, 70, .5)' 
-		          }, {
-		              // Neutral - Blue
-		              value: 5,
-		              color: 'rgba(81, 185, 255, .5)'
-		          }, {
-		              // Positive - Green
-		              color: 'rgba(48, 229, 81, .5)'
-		          }
-		        ],
-
-		        pointInterval: 86400000,
-
-		        // Pointer description
-		        pointDescriptionFormatter: function() {
-		          return 'The value for <b>' + this.x + '</b> is <b>' + this.y + '</b>, in series '+ this.series.name;
-		      },
-		          data: []
-		      },
-		      {	// Series dedicated for retweets
-
-		        // Display Linear Regression
-		        regression: true,
-		        regressionSettings: {
-		            type: 'polynomial',
-		            color:  'rgba(229, 70, 52, .7)'
-		        },
-		        
-		        // Title of Each Point
-		        name: 'Sentiment',
-
-		        // Change colors based on POSITIVE, NEGATIVE, NEUTRAL
-		        zones: [
-		          {
-		              // Negatie - Red
-		              value: -5,
-		              color: 'rgba(247, 46, 70, .5)' 
-		          }, {
-		              // Neutral - Blue
-		              value: 5,
-		              color: 'rgba(81, 185, 255, .5)'
-		          }, {
-		              // Positive - Green
-		              color: 'rgba(48, 229, 81, .5)'
-		          }
-		        ],
-
-		        pointInterval: 86400000,
-
-		        // Pointer description
-		        pointDescriptionFormatter: function() {
-		          return 'The value for <b>' + this.x + '</b> is <b>' + this.y + '</b>, in series '+ this.series.name;
-		      },
-		          data: []
-		      }]
-		});
-
-
-        	$('#hideRetweets').click(function () {
-        		console.log("Hide retweets")
-    			chart.series[1].hide();
-			});
-			$('#showRetweets').click(function () {
-        		console.log("Show retweets")
-    			chart.series[1].show();
-			});
-
-        	/* Websockets */
-
-            // Use a "/test" namespace.
-            // An application can open a connection on multiple namespaces, and
-            // Socket.IO will multiplex all those connections on a single
-            // physical channel. If you don't care about multiple channels, you
-            // can set the namespace to an empty string.
-            namespace = '/test';
-
-            // Connect to the Socket.IO server.
-            // The connection URL has the following format:
-            //     http[s]://<domain>:<port>[/<namespace>]
-            var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-            // Event handler for new connections.
-            // The callback function is invoked when a connection with the
-            // server is established.
-            socket.on('connect', function() {
-                socket.emit('my_event', {data: 'I\'m connected!'});
-            });
-
-            // Event handler for server sent data.
-            // The callback function is invoked whenever the server emits data
-            // to the client. The data is then displayed in the "Received"
-            // section of the page.
-            socket.on('my_response', function(msg) {
-                $('#log').append('<br>' + $('<div/>').text('Received #' + msg.sentiment + ': ' + msg.data).html());
-                console.log("Retweet: " + msg.retweet);
-                // Dynamically add points to the first series
-                if( msg.retweet ) {
-					chart.series[1].addPoint(msg.sentiment * 100, true, false, true);
-				} else {
-					chart.series[0].addPoint(msg.sentiment * 100, true, false, true);
-				}
-            });
-
-            // Interval function that tests message latency by sending a "ping"
-            // message. The server then responds with a "pong" message and the
-            // round trip time is measured.
-            var ping_pong_times = [];
-            var start_time;
-            window.setInterval(function() {
-                start_time = (new Date).getTime();
-                socket.emit('my_ping');
-            }, 1000);
-
-            // Handler for the "pong" message. When the pong is received, the
-            // time from the ping is stored, and the average of the last 30
-            // samples is average and displayed.
-            socket.on('my_pong', function() {
-                var latency = (new Date).getTime() - start_time;
-                ping_pong_times.push(latency);
-                ping_pong_times = ping_pong_times.slice(-30); // keep last 30 samples
-                var sum = 0;
-                for (var i = 0; i < ping_pong_times.length; i++)
-                    sum += ping_pong_times[i];
-                $('#ping-pong').text(Math.round(10 * sum / ping_pong_times.length) / 10);
-            });
-        });
-    </script>
-</head>
-<body>
+    <!-- Basic scripts for highcharts API -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="../static/js/streaming.js"></script>
+  </head>
+  <body>
+    <input id="hashtag" type="text" placeholder="keyword (e.g. sdsc, trump)">
     <h1>Flask-SocketIO Test</h1>
     <p>Async mode is: <b>{{ async_mode }}</b></p>
     <p>Average ping/pong latency: <b><span id="ping-pong"></span>ms</b></p>
     <h2>Send:</h2>
-	<div id="container" style="height: 400px"></div>
-	<button id="hideRetweets">Hide Retweets</button>
+    <div id="container" style="height: 400px"></div>
+    <button id="hideRetweets">Hide Retweets</button>
     <button id="showRetweets">Show Retweets</button>
     <h2>Receive:</h2>
-   	<h1>Live tweets of: streaming_chocie</h1>
+    <h1>Live tweets of: streaming_chocie</h1>
     <div id="log"></div>
     <div id="container2"></div>
-</body>
+  </body>
 </html>
