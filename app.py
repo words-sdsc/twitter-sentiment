@@ -7,11 +7,11 @@ import sqlite3
 
 # Imports for Web Sockets
 from threading import Lock
-from flask_socketio import SocketIO, emit, join_room, leave_room, close_room, rooms, disconnect
+from flask_socketio import SocketIO, emit 
 
 # Local Imports
 import settings
-import streaming
+from streaming import TwitterStream, Credentials, CredentialsManager
 
 
 test_arr = []
@@ -21,9 +21,29 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app, async_mode=async_mode)
 
-thread1 = None
-thread2 = None
+thread = None
 thread_lock = Lock()
+
+
+@app.cli.command()
+def configure():
+    path = settings.CREDENTIALS_PATH
+    manager = CredentialsManager(path)
+
+    if path.exists():
+        cred = manager.read()
+    else:
+        cred = Credentials()
+
+    user_input = lambda msg: input(msg).strip()
+    promptify  = lambda text: text.replace('_', ' ').title()
+
+    for key in cred:
+        val = user_input(promptify(key) + ' [' + cred[key] + ']: ')
+        cred[key] = val
+
+    manager.write(cred)
+
 
 """ Default home page.
 
@@ -103,31 +123,29 @@ def stream():
     return render_template("streaming.html", async_mode=socketio.async_mode)
 
 
-def background_thread1():
-    """Example of how to send server generated events to clients."""
-    count = 0
-    streaming.start(socketio)
+def background_thread(hashtag):
+    print("Stream is flowing...")
+    stream = TwitterStream(socketio)
+    stream.flow(hashtag)
+
 
 def work(tweet, count):
     socketio.emit('my_response',
           {'data': str(tweet), 'count': count},
           namespace='/test')
 
-@socketio.on('connect', namespace='/test')
-def test_connect():
-    global thread1
+
+@socketio.on('start_stream', namespace='/streaming')
+def start_stream(message):
+    global thread
+    hashtag = message['hashtag']
+
     with thread_lock:
-        print("Starting thread 1")
-        if thread1 is None:
-            thread1 = socketio.start_background_task(target=background_thread1)
+        print("Starting thread")
+        if thread is None:
+            thread = socketio.start_background_task(background_thread, hashtag)
 
-    emit('my_response', {'data': 'Successfully Connected Socket', 'count': 0})
 
-#
-# Socket messages
-#
-
-# Starts up the webserver
 if __name__ == "__main__":
     print("Running server...")
-    socketio.run(app)
+    socketio.run(app, debug=True)
