@@ -1,28 +1,15 @@
-<!DOCTYPE HTML>
-<html>
-  <head>
-    <title>Flask-SocketIO Test</title>
-    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
-
-    <!-- Basic scripts for highcharts API -->
-    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="https://code.highcharts.com/stock/highstock.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
-    <script src="../static/js/streaming.js"></script>
-  </head>
-  <body>
-    <input id="hashtag" type="text" placeholder="keyword (e.g. sdsc, trump)">
-    <h1>Flask-SocketIO Test</h1>
-    <p>Async mode is: <b>{{ async_mode }}</b></p>
-    <p>Average ping/pong latency: <b><span id="ping-pong"></span>ms</b></p>
-    <h2>Send:</h2>
-    <div id="container" style="height: 400px"></div>
-    <button id="hideRetweets">Hide Retweets</button>
-    <button id="showRetweets">Show Retweets</button>
-    <h2>Receive:</h2>
-    <h1>Live tweets of: streaming_chocie</h1>
-    <div id="log"></div>
-    <div id="container2"></div>
-  </body>
-</html>
+{% extends "streaming.layout.html" %}
+{% block body %}
+  <h1>Flask-SocketIO Test</h1>
+  <p>Async mode is: <b>{{ async_mode }}</b></p>
+  <p>Average ping/pong latency: <b><span id="ping-pong"></span>ms</b></p>
+  <div id="leaflet-map-container"></div>
+  <h2>Send:</h2>
+  <div id="highcharts-chart-container" style="height: 400px"></div>
+  <button id="hideRetweets">Hide Retweets</button>
+  <button id="showRetweets">Show Retweets</button>
+  <h2>Receive:</h2>
+  <h1>Live tweets of: streaming_chocie</h1>
+  <div id="log"></div>
+  <div id="container2"></div>
+{% endblock %}
