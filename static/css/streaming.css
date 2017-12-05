@@ -1,0 +1,14 @@
+html, body { height: 100%; }
+#leaflet-map-container { height: 500px; }
+.hashtag-input {
+    width: 200px;
+    border: 1px solid #c2c2c2;
+    border-radius: 4px;
+    box-shadow: 1px 1px 4px #ebebeb;
+    padding: 7px;
+    outline: none;
+}
+
+.hashtag-input:focus {
+    border: 2px solid #5231e9;
+}
