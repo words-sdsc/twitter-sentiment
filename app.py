@@ -129,20 +129,14 @@ def background_thread(hashtag):
     stream.flow(hashtag)
 
 
-def work(tweet, count):
-    socketio.emit('my_response',
-          {'data': str(tweet), 'count': count},
-          namespace='/test')
-
-
 @socketio.on('start_stream', namespace='/streaming')
 def start_stream(message):
     global thread
     hashtag = message['hashtag']
 
     with thread_lock:
-        print("Starting thread")
         if thread is None:
+            print("Starting thread")
             thread = socketio.start_background_task(background_thread, hashtag)
 
 
