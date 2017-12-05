@@ -18,7 +18,9 @@ class StreamListener(tweepy.StreamListener):
     def on_data(self, data):
         json_data = json.loads(data)
 
-        tweet_id = json_data['id']
+        if 'text' not in json_data:
+            return
+
         text = json_data['text']
         sentiment = getSentiment(text)
 
@@ -29,7 +31,6 @@ class StreamListener(tweepy.StreamListener):
         self.socketio.emit("response",
                            { "text": text,
                              "sentiment": sentiment,
-                             "tweet_id": tweet_id,
                              "retweeted": retweeted },
                            namespace="/streaming")
 
@@ -53,7 +54,7 @@ class TwitterStream():
         self.stream = tweepy.Stream(auth, StreamListener(socketio))
 
     def flow(self, hashtag):
-        self.stream.filter(track=[hashtag])
+        self.stream.filter(track=[hashtag], languages=["en"])
 
 
 class CredentialsManager():
