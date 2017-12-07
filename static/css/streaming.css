@@ -1,5 +1,5 @@
 html, body { height: 100%; }
-#leaflet-map-container { height: 500px; }
+#leaflet-map-container { height: 80%; }
 .hashtag-input {
     width: 200px;
     border: 1px solid #c2c2c2;
@@ -11,4 +11,9 @@ html, body { height: 100%; }
 
 .hashtag-input:focus {
     border: 2px solid #5231e9;
+}
+#highcharts-chart-container {
+    width: 500px;
+    height: 401px;
+    border: 1px black solid;
 }
