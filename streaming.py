@@ -18,7 +18,8 @@ class StreamListener(tweepy.StreamListener):
     def on_data(self, data):
         json_data = json.loads(data)
 
-        if 'text' not in json_data:
+        # skip this tweet if it doesn't have the desired attributes
+        if not all([key in json_data for key in ["text", "created_at"]]):
             return
 
         text = json_data['text']
@@ -30,6 +31,7 @@ class StreamListener(tweepy.StreamListener):
 
         self.socketio.emit("response",
                            { "text": text,
+                             "created_at": json_data["created_at"],
                              "sentiment": sentiment,
                              "retweeted": retweeted },
                            namespace="/streaming")
