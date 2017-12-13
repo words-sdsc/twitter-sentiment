@@ -23,6 +23,7 @@ socketio = SocketIO(app, async_mode=async_mode)
 
 thread = None
 thread_lock = Lock()
+twitter_stream = TwitterStream(socketio)
 
 
 @app.cli.command()
@@ -125,8 +126,13 @@ def stream():
 
 def background_thread(hashtag):
     print("Stream is flowing...")
-    stream = TwitterStream(socketio)
-    stream.flow(hashtag)
+    twitter_stream.flow(hashtag)
+
+
+@socketio.on('stop_stream', namespace='/streaming')
+def stop_stream():
+    print("Stream flow is ending...")
+    twitter_stream.end_flow()
 
 
 @socketio.on('start_stream', namespace='/streaming')

@@ -13,7 +13,7 @@ class StreamListener(tweepy.StreamListener):
         self.socketio = socketio
 
     def on_connect(self):
-        print("Successfully connected to the Twitter Streaming API")
+        print("Successfully connected to the Twitter stream")
 
     def on_data(self, data):
         json_data = json.loads(data)
@@ -57,6 +57,9 @@ class TwitterStream():
 
     def flow(self, hashtag):
         self.stream.filter(track=[hashtag], languages=["en"])
+
+    def end_flow(self):
+        self.stream.disconnect()
 
 
 class CredentialsManager():

@@ -240,12 +240,12 @@ $(function() {
 
 
   $('#hideRetweets').click(function () {
-    console.log("Hide retweets")
-      chart.series[1].hide();
+    console.log("Hide retweets");
+    chart.series[1].hide();
   });
   $('#showRetweets').click(function () {
-    console.log("Show retweets")
-      chart.series[1].show();
+    console.log("Show retweets");
+    chart.series[1].show();
   });
 
   /* Websockets */
@@ -269,6 +269,11 @@ $(function() {
       chart.series[0].addPoint([milliseconds, msg.sentiment * 100]);
       //chart.series[0].addPoint(msg.sentiment * 100, true, false, true);
     }
+  });
+
+  $("#disconnect-btn").click(function() {
+    socket.emit('stop_stream');
+    return false;
   });
 
   // Interval function that tests message latency by sending a "ping"
