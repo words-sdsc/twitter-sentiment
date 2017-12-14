@@ -97,8 +97,22 @@ $(function() {
   map.addControl(chartControl);
 
   map.on(L.Draw.Event.CREATED, function (e) {
-    if (e.layerType === 'rectangle')
-      console.log(e.layer.getLatLngs());
+    var bounding_box;
+
+    if (e.layerType === 'rectangle') {
+      const latlngs = e.layer.getLatLngs()[0];
+
+      // retrieve only the southwest and northeast longtitude and latitude
+      bounding_box = latlngs.filter((el, idx) => [0, 2].includes(idx));
+
+      // transform into format accepted by Twitter API
+      // [longtitude, latitude, longtitude, latitude]
+      bounding_box = bounding_box.map((el) => [el.lng, el.lat]);
+      bounding_box = [].concat.apply([], bounding_box);
+
+      socket.emit('start_stream', { 'bounding box': bounding_box });
+    }
+
     drawnItems.addLayer(e.layer);
   });
 

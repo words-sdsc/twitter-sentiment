@@ -55,8 +55,17 @@ class TwitterStream():
                               cred['access_token_secret'])
         self.stream = tweepy.Stream(auth, StreamListener(socketio))
 
-    def flow(self, hashtag):
-        self.stream.filter(track=[hashtag], languages=["en"])
+    def flow(self, message):
+        try:
+            hashtag = message["hashtag"]
+            self.stream.filter(track=[hashtag], languages=["en"])
+        except KeyError as err:
+            print(err, "is not a key in the dictionary.")
+            print("Trying the key 'bounding box'")
+
+            bounding_box = message["bounding box"]
+            self.stream.filter(locations=bounding_box, languages=["en"])
+
 
     def end_flow(self):
         self.stream.disconnect()

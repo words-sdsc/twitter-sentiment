@@ -124,9 +124,9 @@ def stream():
     return render_template("streaming.html", async_mode=socketio.async_mode)
 
 
-def background_thread(hashtag):
+def background_thread(message):
     print("Stream is flowing...")
-    twitter_stream.flow(hashtag)
+    twitter_stream.flow(message)
 
 
 @socketio.on('stop_stream', namespace='/streaming')
@@ -138,12 +138,11 @@ def stop_stream():
 @socketio.on('start_stream', namespace='/streaming')
 def start_stream(message):
     global thread
-    hashtag = message['hashtag']
 
     with thread_lock:
         if thread is None:
             print("Starting thread")
-            thread = socketio.start_background_task(background_thread, hashtag)
+            thread = socketio.start_background_task(background_thread, message)
 
 
 if __name__ == "__main__":
