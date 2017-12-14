@@ -80,7 +80,10 @@ var chartControl = new ChartControl();
 
 $(function() {
   /* Leaflet */
-  map = L.map('leaflet-map-container', { center: [38.4404, -122.7141], zoom: 13});
+  map = L.map('leaflet-map-container', {
+    center: [38.4404, -122.7141],
+    zoom: 5}
+  );
 
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
       maxZoom: 18,

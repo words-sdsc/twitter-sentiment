@@ -8,9 +8,24 @@ import settings
 
 class StreamListener(tweepy.StreamListener):
 
-    def __init__(self, socketio):
+    def __init__(self, socketio, hashtag=None, filter_by_hashtag=False):
+        """
+        Args:
+            socketio (SocketIO): Used for emitting the tweet data to the client
+
+            filter_by_hashtag (bool): When filtering the stream with a bounding
+                                      box, an extra filter needs to be performed
+                                      to emit only the tweets with the desired
+                                      hashtag
+
+            hashtag (string): If 'filter_by_hashtag' is specified, this is
+                              required to assist the internal filter
+        """
+
         super().__init__()
         self.socketio = socketio
+        self.filter_by_hashtag = filter_by_hashtag
+        self.hashtag = hashtag
 
     def on_connect(self):
         print("Successfully connected to the Twitter stream")
@@ -21,6 +36,14 @@ class StreamListener(tweepy.StreamListener):
         # skip this tweet if it doesn't have the desired attributes
         if not all([key in json_data for key in ["text", "created_at"]]):
             return
+
+        if self.filter_by_hashtag:
+            if 'entities' in json_data and json_data['entities']['hashtags']:
+                entities = json_data['entities']
+                hashtags = map(lambda x: x['text'], entities['hashtags'])
+
+                if not self.hashtag in hashtags:
+                    return
 
         text = json_data['text']
         sentiment = getSentiment(text)
@@ -42,6 +65,7 @@ class StreamListener(tweepy.StreamListener):
             return False
 
 
+# TODO refactor method 'flow' to reflect changes in StreamListener
 class TwitterStream():
 
     def __init__(self, socketio):
