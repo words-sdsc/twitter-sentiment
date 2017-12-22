@@ -2,7 +2,7 @@ import os
 import sqlite3
 
 import settings
-from TwitterScraper.TwitterScraper.spiders.searchMiner import *
+from TwitterScraper.spiders.searchMiner import *
 from SentimentAnalysis.cleanTweets import *
 from SentimentAnalysis.sentimentAnalysis import *
 
@@ -33,6 +33,7 @@ def tablify( string ):
 
 def getTableName():
     return settings.tableName
+
 def getUrlQuery():
     return settings.url
 

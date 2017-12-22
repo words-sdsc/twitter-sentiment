@@ -24,9 +24,8 @@ import sys
 from scrapy.crawler import CrawlerProcess
 
 # Import Global Variables
-sys.path.append("../../..")
 import settings
-from main import *
+from main import getTableName, getUrlQuery
 
 
 SPIDER_NAME = "twitter"
