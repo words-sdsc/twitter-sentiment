@@ -8,24 +8,22 @@ import settings
 
 class StreamListener(tweepy.StreamListener):
 
-    def __init__(self, socketio, hashtag=None, filter_by_hashtag=False):
+    def __init__(self, socketio, hashtag=""):
         """
-        Args:
+        Fields:
             socketio (SocketIO): Used for emitting the tweet data to the client
 
-            filter_by_hashtag (bool): When filtering the stream with a bounding
-                                      box, an extra filter needs to be performed
-                                      to emit only the tweets with the desired
-                                      hashtag
+            hashtag (string): When filtering the stream with a bounding
+                              box, an extra filter needs to be performed
+                              to emit only the tweets with the desired
+                              hashtag
 
-            hashtag (string): If 'filter_by_hashtag' is specified, this is
-                              required to assist the internal filter
         """
 
         super().__init__()
         self.socketio = socketio
-        self.filter_by_hashtag = filter_by_hashtag
-        self.hashtag = hashtag
+        self.hashtag  = hashtag.replace("#", "").lower()
+
 
     def on_connect(self):
         print("Successfully connected to the Twitter stream")
@@ -33,17 +31,19 @@ class StreamListener(tweepy.StreamListener):
     def on_data(self, data):
         json_data = json.loads(data)
 
-        # skip this tweet if it doesn't have the desired attributes
+        # skip this tweet if it doesn't have the basic attributes
         if not all([key in json_data for key in ["text", "created_at"]]):
             return
 
-        if self.filter_by_hashtag:
-            if 'entities' in json_data and json_data['entities']['hashtags']:
-                entities = json_data['entities']
-                hashtags = map(lambda x: x['text'], entities['hashtags'])
+        if self.hashtag:
+            if not ('entities' in json_data and json_data['entities']['hashtags']):
+                return
 
-                if not self.hashtag in hashtags:
-                    return
+            entities = json_data['entities']
+            hashtags = map(lambda x: x['text'].lower(), entities['hashtags'])
+
+            if not self.hashtag in hashtags:
+                return
 
         text = json_data['text']
         sentiment = getSentiment(text)
@@ -53,11 +53,12 @@ class StreamListener(tweepy.StreamListener):
             text = text.replace("RT @", "")
 
         self.socketio.emit("response",
-                           { "text": text,
-                             "created_at": json_data["created_at"],
-                             "sentiment": sentiment,
-                             "retweeted": retweeted },
-                           namespace="/streaming")
+                { "text": text,
+                    "created_at": json_data["created_at"],
+                    "sentiment": sentiment,
+                    "retweeted": retweeted },
+                namespace="/streaming")
+
 
     def on_error(self, status_code):
         print('ERROR', status_code)
@@ -65,30 +66,37 @@ class StreamListener(tweepy.StreamListener):
             return False
 
 
-# TODO refactor method 'flow' to reflect changes in StreamListener
+def retrieve_authentication():
+    manager = CredentialsManager(settings.CREDENTIALS_PATH)
+    cred = manager.read()
+
+    auth = tweepy.OAuthHandler(cred['twitter_api_key'], cred['twitter_api_secret'])
+    auth.set_access_token(cred['access_token'], cred['access_token_secret'])
+
+    return auth
+
+
 class TwitterStream():
 
-    def __init__(self, socketio):
-        manager = CredentialsManager(settings.CREDENTIALS_PATH)
-        cred = manager.read()
+    def __init__(self):
+        self.stream = None
 
-        auth = tweepy.OAuthHandler(cred['twitter_api_key'] ,
-                                   cred['twitter_api_secret'])
 
-        auth.set_access_token(cred['access_token'],
-                              cred['access_token_secret'])
-        self.stream = tweepy.Stream(auth, StreamListener(socketio))
+    def flow(self, message, socketio):
+        auth = retrieve_authentication()
+        hashtag = message["hashtag"]
 
-    def flow(self, message):
-        try:
-            hashtag = message["hashtag"]
+        if 'bounding box' in message:
+            listener = StreamListener(socketio, hashtag)
+            self.stream = tweepy.Stream(auth, listener)
+
+            bbox = message["bounding box"]
+            self.stream.filter(locations=bbox, languages=["en"])
+        else:
+            listener = StreamListener(socketio)
+            self.stream = tweepy.Stream(auth, listener)
+
             self.stream.filter(track=[hashtag], languages=["en"])
-        except KeyError as err:
-            print(err, "is not a key in the dictionary.")
-            print("Trying the key 'bounding box'")
-
-            bounding_box = message["bounding box"]
-            self.stream.filter(locations=bounding_box, languages=["en"])
 
 
     def end_flow(self):
@@ -120,6 +128,6 @@ class Credentials(dict):
 
     def __init__(self):
         super(Credentials, self).__init__(
-            { 'twitter_api_key': 'None', 'twitter_api_secret': 'None',
-              'access_token': 'None', 'access_token_secret': 'None' }
-        )
+                { 'twitter_api_key': 'None', 'twitter_api_secret': 'None',
+                    'access_token': 'None', 'access_token_secret': 'None' }
+                )
