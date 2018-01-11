@@ -1,12 +1,29 @@
+function hasRedBoundingBox(layerGroup) {
+  let flag = false;
+
+  layerGroup.eachLayer( (layer) => {
+    let color = layer.options.color;
+    if (color === Colors.darkred) flag = true;
+  });
+
+  return flag;
+}
+
 var Colors = {
-  // Negative - Red
+  // Negative sentiment
   red: 'rgba(247, 46, 70, .5)',
 
-  // Neutral - Blue
+  // Neutral sentiment
   blue: 'rgba(81, 185, 255, .5)',
 
-  // Positive - Green
-  green: 'rgba(48, 229, 81, .5)'
+  // Positive sentiment
+  green: 'rgba(48, 229, 81, .5)',
+
+  // Active bounding box
+  darkred: '#893231',
+
+  // Non-active bounding box
+  black: '#000000'
 };
 
 var map;
@@ -17,12 +34,42 @@ var protocol = location.protocol;
 var port = location.port;
 var domain = document.domain;
 
+var bounding_box = [];
+
 // Connect to the Socket.IO server.
 // The connection URL has the following format:
 //     http[s]://<domain>:<port>[/<namespace>]
 var socket = io.connect(protocol + '//' + domain + ':' + port + namespace);
 
 var drawnItems = new L.FeatureGroup();
+
+drawnItems.on('click', function(e) {
+  var clicked_layer = e.layer;
+
+  const latlngs = e.layer.getLatLngs()[0];
+
+  // retrieve only the southwest and northeast longtitude and latitude
+  bounding_box = latlngs.filter((el, idx) => [0, 2].includes(idx));
+
+  // transform into format accepted by Twitter API
+  // [longtitude, latitude, longtitude, latitude]
+  bounding_box = bounding_box.map( (elem) => [elem.lng, elem.lat] );
+  bounding_box = [].concat.apply([], bounding_box);
+
+  if (clicked_layer.options.color == Colors.darkred)
+    style = { color: Colors.black, weight: 2, opacity: 0.7}
+  else
+    style = { color: Colors.darkred, weight: 4, opacity: 0.9}
+
+  clicked_layer.setStyle(style);
+
+  drawnItems.eachLayer( (layer) => {
+    if (layer !== clicked_layer) {
+      layer.setStyle({ color: Colors.black, weight: 2, opacity: 0.7 });
+    }
+  });
+});
+
 var drawOptions = {
   position: 'topleft',
   draw: {
@@ -30,7 +77,7 @@ var drawOptions = {
     polygon:  false,
     circle:   false,
     rectangle: {
-      shapeOptions: { color: '#5A0888', weight: 4 }
+      shapeOptions: { color: Colors.black, weight: 2, opacity: 0.7 }
     }
   },
   edit: {
@@ -57,7 +104,12 @@ var HashTagControl = L.Control.extend({
 
     L.DomEvent.on(input, 'keydown', function(e) {
       if (e.keyCode === 13) {
-        socket.emit('start_stream', { hashtag : input.value });
+        message = { 'hashtag': input.value };
+
+        if (hasRedBoundingBox(drawnItems))
+          message['bounding box'] = bounding_box;
+
+        socket.emit('start_stream', message);
       }
     });
 
@@ -100,23 +152,9 @@ $(function() {
   map.addControl(chartControl);
 
   map.on(L.Draw.Event.CREATED, function (e) {
-    var bounding_box;
-
     if (e.layerType === 'rectangle') {
-      const latlngs = e.layer.getLatLngs()[0];
-
-      // retrieve only the southwest and northeast longtitude and latitude
-      bounding_box = latlngs.filter((el, idx) => [0, 2].includes(idx));
-
-      // transform into format accepted by Twitter API
-      // [longtitude, latitude, longtitude, latitude]
-      bounding_box = bounding_box.map((el) => [el.lng, el.lat]);
-      bounding_box = [].concat.apply([], bounding_box);
-
-      socket.emit('start_stream', { 'bounding box': bounding_box });
+      drawnItems.addLayer(e.layer);
     }
-
-    drawnItems.addLayer(e.layer);
   });
 
   /* Highcharts */
@@ -316,4 +354,3 @@ $(function() {
     $('#ping-pong').text(Math.round(10 * sum / ping_pong_times.length) / 10);
   });
 });
-
