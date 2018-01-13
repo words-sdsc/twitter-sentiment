@@ -11,7 +11,7 @@ from flask_socketio import SocketIO, emit
 
 # Local Imports
 import settings
-from streaming import TwitterStream, Credentials, CredentialsManager
+from streaming import DataFlow, Credentials, CredentialsManager
 
 
 test_arr = []
@@ -23,7 +23,7 @@ socketio = SocketIO(app, async_mode=async_mode)
 
 thread = None
 thread_lock = Lock()
-twitter_stream = TwitterStream()
+flow = None
 
 
 @app.cli.command()
@@ -125,14 +125,22 @@ def stream():
 
 
 def background_thread(message):
+    global flow
+
     print("Stream is flowing...")
-    twitter_stream.flow(message, socketio)
+    if message['flow type'] == 'historical':
+        flow = DataFlow.factory(message['flow type'])
+    else:
+        flow = DataFlow.factory(message['flow type'])
+
+    flow.start(message, socketio)
+
 
 
 @socketio.on('stop_stream', namespace='/streaming')
 def stop_stream():
     print("Stream flow is ending...")
-    twitter_stream.end_flow()
+    flow.stop()
 
 
 @socketio.on('start_stream', namespace='/streaming')

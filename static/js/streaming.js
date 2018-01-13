@@ -104,7 +104,7 @@ var HashTagControl = L.Control.extend({
 
     L.DomEvent.on(input, 'keydown', function(e) {
       if (e.keyCode === 13) {
-        message = { 'hashtag': input.value };
+        message = {'hashtag': input.value, 'flow type': 'historical'};
 
         if (hasRedBoundingBox(drawnItems))
           message['bounding box'] = bounding_box;
