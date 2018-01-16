@@ -1,13 +1,29 @@
-function hasRedBoundingBox(layerGroup) {
-  let flag = false;
+function hasActiveShape(layerGroup, shapeType) {
+  var flag = false;
 
   layerGroup.eachLayer( (layer) => {
-    let color = layer.options.color;
-    if (color === Colors.darkred) flag = true;
+    var color = layer.options.color;
+    if (color === Colors.darkred && layer instanceof shapeType)
+      flag = true;
   });
 
   return flag;
 }
+
+
+var Mapbox = {
+  satellite: 'mapbox.satellite',
+  streets: 'mapbox.streets',
+  outdoors: 'mapbox.outdoors',
+  url: 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?' +
+    'access_token={accessToken}',
+  attribution: 'Map data &copy; <a href="http://openstreetmap.org">' +
+    'OpenStreetMap</a> contributors, <a href="http://creativecommons.org/' +
+    'licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.' +
+    'com">Mapbox</a>',
+  accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3' +
+    'gifQ.rJcFIG214AriISLbB6B5aw',
+};
 
 var Colors = {
   // Negative sentiment
@@ -29,12 +45,14 @@ var Colors = {
 var map;
 var chart;
 
+var boundingBox;
+var geolocation;
+
 var namespace = '/streaming';
 var protocol = location.protocol;
 var port = location.port;
 var domain = document.domain;
 
-var bounding_box = [];
 
 // Connect to the Socket.IO server.
 // The connection URL has the following format:
@@ -44,27 +62,35 @@ var socket = io.connect(protocol + '//' + domain + ':' + port + namespace);
 var drawnItems = new L.FeatureGroup();
 
 drawnItems.on('click', function(e) {
-  var clicked_layer = e.layer;
 
-  const latlngs = e.layer.getLatLngs()[0];
+  const clickedLayer = e.layer;
 
-  // retrieve only the southwest and northeast longtitude and latitude
-  bounding_box = latlngs.filter((el, idx) => [0, 2].includes(idx));
+  if (clickedLayer instanceof L.Circle) {
+    const latlng = clickedLayer.getLatLng();
+    const radius = clickedLayer.getRadius();
+    geolocation = [latlng.lat, latlng.lng, radius / 1000];
+  } else {
+    const latlngs = clickedLayer.getLatLngs()[0];
 
-  // transform into format accepted by Twitter API
-  // [longtitude, latitude, longtitude, latitude]
-  bounding_box = bounding_box.map( (elem) => [elem.lng, elem.lat] );
-  bounding_box = [].concat.apply([], bounding_box);
+    // retrieve only the southwest and northeast longtitude and latitude
+    boundingBox = latlngs.filter((el, idx) => [0, 2].includes(idx));
 
-  if (clicked_layer.options.color == Colors.darkred)
+    // transform into format accepted by Twitter API
+    // [longtitude, latitude, longtitude, latitude]
+    boundingBox = boundingBox.map( (elem) => [elem.lng, elem.lat] );
+    boundingBox = [].concat.apply([], boundingBox);
+  }
+
+
+  if (clickedLayer.options.color == Colors.darkred)
     style = { color: Colors.black, weight: 2, opacity: 0.7}
   else
     style = { color: Colors.darkred, weight: 4, opacity: 0.9}
 
-  clicked_layer.setStyle(style);
+  clickedLayer.setStyle(style);
 
   drawnItems.eachLayer( (layer) => {
-    if (layer !== clicked_layer) {
+    if (layer !== clickedLayer) {
       layer.setStyle({ color: Colors.black, weight: 2, opacity: 0.7 });
     }
   });
@@ -74,8 +100,12 @@ var drawOptions = {
   position: 'topleft',
   draw: {
     polyline: false,
-    polygon:  false,
-    circle:   false,
+    polygon: false,
+    circlemarker: false,
+    marker: false,
+    circle: {
+      shapeOptions: { color: Colors.black, weight: 2, opacity: 0.7 }
+    },
     rectangle: {
       shapeOptions: { color: Colors.black, weight: 2, opacity: 0.7 }
     }
@@ -106,7 +136,7 @@ var HashTagControl = L.Control.extend({
       if (e.keyCode === 13) {
         message = {'hashtag': input.value, 'flow type': 'historical'};
 
-        if (hasRedBoundingBox(drawnItems))
+        if (hasActiveShape(drawnItems, L.Rectangle))
           message['bounding box'] = bounding_box;
 
         socket.emit('start_stream', message);
@@ -132,19 +162,42 @@ var chartControl = new ChartControl();
 
 $(function() {
   /* Leaflet */
-  map = L.map('leaflet-map-container', {
-    center: [38.4404, -122.7141],
-    zoom: 5}
-  );
 
-  L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-      maxZoom: 18,
-      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-      '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-      'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-      id: 'mapbox.streets',
-      accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'
-  }).addTo(map);
+  var satellite = L.tileLayer(Mapbox.url, {
+    id: Mapbox.satellite,
+    attribution: Mapbox.attribution,
+    accessToken: Mapbox.accessToken
+  });
+  var streets = L.tileLayer(Mapbox.url, {
+    id: Mapbox.streets,
+    attribution: Mapbox.attribution,
+    accessToken: Mapbox.accessToken
+  });
+  var outdoors = L.tileLayer(Mapbox.url, {
+    id: Mapbox.outdoors,
+    attribution: Mapbox.attribution,
+    accessToken: Mapbox.accessToken
+  });
+
+
+  map = L.map('leaflet-map-container', {
+    center: [36.89, -119.58],
+    zoom: 6,
+    layers: [streets]
+  });
+
+  var baseMaps = {
+    'Streets': streets,
+    'Outdoors': outdoors,
+    'Satellite': satellite
+  };
+
+  var overlayMaps = {
+    'Live': drawnItems,
+    'Historical': drawnItems
+  };
+
+  L.control.layers(baseMaps).addTo(map);
 
   map.addLayer(drawnItems);
   map.addControl(drawnControl);
@@ -152,10 +205,9 @@ $(function() {
   map.addControl(chartControl);
 
   map.on(L.Draw.Event.CREATED, function (e) {
-    if (e.layerType === 'rectangle') {
-      drawnItems.addLayer(e.layer);
-    }
+    drawnItems.addLayer(e.layer);
   });
+
 
   /* Highcharts */
   chart = Highcharts.chart('highcharts-chart-container', {
