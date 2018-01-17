@@ -12,8 +12,9 @@ html, body { height: 100%; }
 .hashtag-input:focus {
     border: 2px solid #5231e9;
 }
-#highcharts-chart-container {
+#chart-container {
     width: 500px;
     height: 401px;
     border: 1px black solid;
+    display: none;
 }

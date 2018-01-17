@@ -134,6 +134,7 @@ var HashTagControl = L.Control.extend({
 
     L.DomEvent.on(input, 'keydown', function(e) {
       if (e.keyCode === 13) {
+        $("#chart-container").show();
         message = {'hashtag': input.value, 'flow type': 'historical'};
 
         if (hasActiveShape(drawnItems, L.Rectangle))
@@ -154,7 +155,7 @@ var ChartControl = L.Control.extend({
   },
   onAdd: function (map) {
     var div = L.DomUtil.create('div');
-    div.id = 'highcharts-chart-container';
+    div.id = 'chart-container';
     return div
   }
 });
@@ -209,12 +210,27 @@ $(function() {
   });
 
 
-  /* Highcharts */
-  chart = Highcharts.chart('highcharts-chart-container', {
+  /* Generating a cross symbol to place on sentiment analysis charts. The
+   * cross symbol is meant to close down the chart and stop the stream flow when
+   * clicked.
+   */
+  $.extend(Highcharts.Renderer.prototype.symbols, {
+      exit: function(x, y, width, height) {
+        return [ "M", x, y,
+                 "L", x + width, y + height,
+                 "M", x, y + height,
+                 "L", x + width, y ]
+      }
+  });
+
+  /* Chart configuration */
+  chart = Highcharts.chart('chart-container', {
     credits: {
       enabled: false
     },
-    // Declare chart type and basic information
+    lang: {
+      empty: ''
+    },
     chart: {
       type: 'scatter',
       zoomType: '',
@@ -223,6 +239,18 @@ $(function() {
     },
     title: {
       text: 'Sentiment Over Time '
+    },
+    exporting: {
+      buttons: {
+        contextButton: {
+          enabled: false
+        },
+        exportingButton: {
+          text: '',
+          _titleKey: 'empty',
+          symbol: 'exit'
+        }
+      }
     },
     // Set up xAxis Attributes
     xAxis: {
