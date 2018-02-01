@@ -2,28 +2,36 @@ from streaming import retrieve_authentication
 import re, tweepy, json
 
 
-HASHTAG_REGEX = re.compile(r'(#\w+fire)', re.IGNORECASE)
-extract = lambda x: HASHTAG_REGEX.match(x).group()
-matched = lambda x: HASHTAG_REGEX.match(x) is not None
+EVENT = r'(fire|flooding|winds)'
+HASHTAG_PATTERN = re.compile('(#\w+' + EVENT + ')', re.IGNORECASE)
 
-def calfire_hashtags(api):
-    statuses = api.user_timeline(screen_name="CALFIRESANDIEGO", count=100)
-    return [extract(status.text) for status in statuses if matched(status.text)]
+extract = lambda x: HASHTAG_PATTERN.search(x).group()
+match = lambda x: HASHTAG_PATTERN.search(x) is not None
+
+
+def myfilter(xs):
+    for x in xs:
+        if match(x): yield extract(x)
+
+def calfire_hashtags(api, calfire_twitter_name):
+    response = api.user_timeline(screen_name=calfire_twitter_name, count=100)
+    statuses = [obj.text for obj in response]
+    return set(myfilter(statuses))
 
 def top_trending(api, woeid):
     response = api.trends_place(woeid)[0]
-    trends = response['trends']
-    return [extract(trend['name']) for trend in trends if matched(trend['name'])]
+    trends = [trend['name'] for trend in response['trends']]
+    return trends
 
 if __name__ == "__main__":
     auth = retrieve_authentication()
     api = tweepy.API(auth)
 
-    for hashtag in calfire_hashtags(api):
+    for hashtag in calfire_hashtags(api, "CAL_FIRE"):
         print(hashtag)
 
     with open("woeids.json") as handle:
         woeids = json.load(handle)
 
-    for hashtag in top_trending(api, woeids['san diego']):
+    for hashtag in top_trending(api, woeids['los angeles']):
         print(hashtag)
