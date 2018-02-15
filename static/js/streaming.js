@@ -68,7 +68,8 @@ drawnItems.on('click', function(e) {
   if (clickedLayer instanceof L.Circle) {
     const latlng = clickedLayer.getLatLng();
     const radius = clickedLayer.getRadius();
-    geolocation = [latlng.lat, latlng.lng, radius / 1000];
+    geolocation = latlng.lat + "," +  latlng.lng + "," +
+                  Math.floor(radius / 1000) + "km";
   } else {
     const latlngs = clickedLayer.getLatLngs()[0];
 
@@ -135,10 +136,12 @@ var HashTagControl = L.Control.extend({
     L.DomEvent.on(input, 'keydown', function(e) {
       if (e.keyCode === 13) {
         $("#chart-container").show();
-        message = {'hashtag': input.value, 'flow type': 'historical'};
+        message = {'hashtag': input.value, 'flow type': 'live'};
 
         if (hasActiveShape(drawnItems, L.Rectangle))
-          message['bounding box'] = bounding_box;
+          message['bounding box'] = boundingBox;
+        else if (hasActiveShape(drawnItems, L.Circle))
+          message['geolocation'] = geolocation;
 
         socket.emit('start_stream', message);
       }
