@@ -20,21 +20,23 @@ def parse(xs):
     for x in xs:
         if match(x): yield extract(x)
 
-def calfire_hashtags(api, calfire_twitter_name):
+def calfire_hashtags(calfire_twitter_name):
+    auth = retrieve_authentication()
+    api = tweepy.API(auth)
     response = api.user_timeline(screen_name=calfire_twitter_name, count=100)
     statuses = [obj.text for obj in response]
     return most_common(parse(statuses), 3)
 
 def top_trending(api, woeid):
+    auth = retrieve_authentication()
+    api = tweepy.API(auth)
     response = api.trends_place(woeid)[0]
     trends = [trend['name'] for trend in response['trends']]
     return trends
 
 if __name__ == "__main__":
-    auth = retrieve_authentication()
-    api = tweepy.API(auth)
 
-    for hashtag in calfire_hashtags(api, "CAL_FIRE"):
+    for hashtag in calfire_hashtags("CAL_FIRE"):
         print(hashtag)
 
     '''
