@@ -1,5 +1,13 @@
-html, body { height: 100%; }
-#leaflet-map-container { height: 80%; }
+body {
+    margin: 0;
+    padding: 0;
+}
+
+html, body, #map {
+    height: 100%;
+    width: 100%;
+}
+
 .hashtag-input {
     width: 200px;
     border: 1px solid #c2c2c2;

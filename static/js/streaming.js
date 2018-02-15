@@ -184,7 +184,7 @@ $(function() {
   });
 
 
-  map = L.map('leaflet-map-container', {
+  map = L.map('map', {
     center: [36.89, -119.58],
     zoom: 6,
     layers: [streets]
