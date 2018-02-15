@@ -8,6 +8,7 @@ html, body, #map {
     width: 100%;
 }
 
+.leaflet-container a { color: #333; }
 .hashtag-input {
     width: 200px;
     border: 1px solid #c2c2c2;
@@ -26,3 +27,24 @@ html, body, #map {
     border: 1px black solid;
     display: none;
 }
+
+ul {
+    list-style: none;
+}
+
+li { height: 30px; margin: 0 0 7px 0; width: 180px; }
+li a {
+    display: block;
+    height: 30px;
+    width: 180px;
+    margin: 0 0 7px 0;
+    padding: 5px 0 0 10px;
+    background-color: #F7F5F2;
+    font-size: 18px;
+    text-decoration: none;
+}
+
+li a:hover { background-color: #EFEFEF; }
+.orange { border-left: 5px solid #F5876E; }
+.purple   { border-left: 5px solid #988CC3; }
+.green  { border-left: 5px solid #8EBd40; }

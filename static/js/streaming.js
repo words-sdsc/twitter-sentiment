@@ -129,9 +129,9 @@ var HashtagsControl = L.Control.extend({
     div.id = "hashtags-container";
     div.innerHTML = `
       <ul>
-      <li></li>
-      <li></li>
-      <li></li>
+      <li class="orange"><a href="#"></a></li>
+      <li class="purple"><a href="#"></a></li>
+      <li class="green"><a href="#"></a></li>
       </ul>`;
 
     L.DomEvent.disableClickPropagation(div);
@@ -419,7 +419,7 @@ $(function() {
     dataType: 'json',
     success: function(data) {
       const div = document.getElementById('hashtags-container');
-      const list = Array.from(div.querySelectorAll('li'));
+      const list = Array.from(div.querySelectorAll('a'));
       const zipped = list.map(function(node, i) {
         return [node, data['result'][i]];
       });
