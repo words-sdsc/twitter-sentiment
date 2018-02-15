@@ -9,14 +9,21 @@ extract = lambda x: HASHTAG_PATTERN.search(x).group()
 match = lambda x: HASHTAG_PATTERN.search(x) is not None
 
 
-def myfilter(xs):
+def most_common(xs, n):
+    from collections import Counter
+    c = Counter()
+    for x in xs:
+        c[x] += 1
+    return [word for word, count in c.most_common(n)]
+
+def parse(xs):
     for x in xs:
         if match(x): yield extract(x)
 
 def calfire_hashtags(api, calfire_twitter_name):
     response = api.user_timeline(screen_name=calfire_twitter_name, count=100)
     statuses = [obj.text for obj in response]
-    return set(myfilter(statuses))
+    return most_common(parse(statuses), 3)
 
 def top_trending(api, woeid):
     response = api.trends_place(woeid)[0]
@@ -30,8 +37,10 @@ if __name__ == "__main__":
     for hashtag in calfire_hashtags(api, "CAL_FIRE"):
         print(hashtag)
 
+    '''
     with open("woeids.json") as handle:
         woeids = json.load(handle)
 
     for hashtag in top_trending(api, woeids['los angeles']):
         print(hashtag)
+    '''
