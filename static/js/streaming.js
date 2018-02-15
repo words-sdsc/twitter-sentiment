@@ -1,3 +1,5 @@
+
+
 function hasActiveShape(layerGroup, shapeType) {
   var flag = false;
 
@@ -117,7 +119,29 @@ var drawOptions = {
 };
 var drawnControl = new L.Control.Draw(drawOptions);
 
-var HashTagControl = L.Control.extend({
+var HashtagsControl = L.Control.extend({
+  options: {
+    position: 'bottomleft',
+  },
+  onAdd: function (map) {
+    var div = L.DomUtil.create('div');
+
+    div.id = "hashtags-container";
+    div.innerHTML = `
+      <ul>
+      <li></li>
+      <li></li>
+      <li></li>
+      </ul>`;
+
+    L.DomEvent.disableClickPropagation(div);
+
+    return div;
+  }
+});
+var hashtagsControl = new HashtagsControl();
+
+var SearchControl = L.Control.extend({
   options: {
     position: 'topright',
     type: 'text',
@@ -150,7 +174,8 @@ var HashTagControl = L.Control.extend({
     return input;
   }
 });
-var hashtagControl = new HashTagControl();
+
+var searchControl = new SearchControl();
 
 var ChartControl = L.Control.extend({
   options: {
@@ -205,7 +230,8 @@ $(function() {
 
   map.addLayer(drawnItems);
   map.addControl(drawnControl);
-  map.addControl(hashtagControl);
+  map.addControl(searchControl);
+  map.addControl(hashtagsControl);
   map.addControl(chartControl);
 
   map.on(L.Draw.Event.CREATED, function (e) {
@@ -384,6 +410,26 @@ $(function() {
   $('#showRetweets').click(function () {
     console.log("Show retweets");
     chart.series[1].show();
+  });
+
+  /* AJAX call to get the top 3 hashtags on CALFIRE */
+  $.ajax({
+    url: protocol + '//' + domain + ':' + port + '/hashtags',
+    type: 'GET',
+    dataType: 'json',
+    success: function(data) {
+      const div = document.getElementById('hashtags-container');
+      const list = Array.from(div.querySelectorAll('li'));
+      const zipped = list.map(function(node, i) {
+        return [node, data['result'][i]];
+      });
+
+      zipped.forEach(function(elem) {
+        elem[0].innerHTML = elem[1];
+      });
+    },
+    error: function (request, error) {
+    }
   });
 
   /* Websockets */

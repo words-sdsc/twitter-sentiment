@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 
 from datetime import datetime
 import time
@@ -119,6 +119,11 @@ Displays a live graph of sentiment over time with a pre-determined selection of
 search queries. (Typically updated with trending tweets)
 
 """
+@app.route('/hashtags', methods=['GET'])
+def hashtags():
+    from hashtag_finder import calfire_hashtags
+    return jsonify(result=calfire_hashtags('CAL_FIRE'))
+
 @app.route('/streaming', methods=['POST','GET'])
 def stream():
     return render_template("streaming.html", async_mode=socketio.async_mode)
