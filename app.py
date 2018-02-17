@@ -1,8 +1,5 @@
 from flask import Flask, render_template, request, jsonify
 
-from datetime import datetime
-import time
-import json
 import sqlite3
 
 # Imports for Web Sockets
@@ -131,30 +128,26 @@ def stream():
 
 def background_thread(message):
     global flow
-
     print("Stream is flowing...")
-    if message['flow type'] == 'historical':
-        flow = DataFlow.factory(message['flow type'])
-    else:
-        flow = DataFlow.factory(message['flow type'])
-
+    flow = DataFlow.factory(message['flow type'])
     flow.start(message, socketio)
 
 
 
 @socketio.on('stop_stream', namespace='/streaming')
 def stop_stream():
+    global thread
     print("Stream flow is ending...")
+    thread = None
     flow.stop()
 
 
 @socketio.on('start_stream', namespace='/streaming')
 def start_stream(message):
     global thread
-
     with thread_lock:
         if thread is None:
-            print("Starting thread")
+            print("Starting thread...")
             thread = socketio.start_background_task(background_thread, message)
 
 
