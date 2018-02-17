@@ -1,6 +1,6 @@
 import tweepy, json
 
-from SentimentAnalysis.sentimentAnalysis import *
+from SentimentAnalysis.sentimentAnalysis import getSentiment
 from flask_socketio import SocketIO, emit
 
 import settings
@@ -60,7 +60,7 @@ class StreamListener(tweepy.StreamListener):
         sentiment = getSentiment(text)
 
         self.socketio.emit("response",
-                {   "text": text,
+                  { "text": text,
                     "created_at": json_data["created_at"],
                     "sentiment": sentiment,
                     "retweeted": retweeted },
@@ -116,7 +116,23 @@ class HistoricalFlow(DataFlow):
             max_id = str(last_id - 1)
 
             try:
-                tweets = self.api.search(q=hashtag, count=100, max_id=max_id, lang=['en'])
+
+                if 'geolocation' in message:
+                    tweets = self.api.search(
+                        q=hashtag,
+                        geocode=message['geolocation'],
+                        count=100,
+                        max_id=max_id,
+                        lang=['en']
+                    )
+                else:
+                    tweets = self.api.search(
+                        q=hashtag,
+                        count=100,
+                        max_id=max_id,
+                        lang=['en']
+                    )
+
                 counter += len(tweets)
 
                 if not tweets:
@@ -139,6 +155,7 @@ class HistoricalFlow(DataFlow):
                             namespace="/streaming")
 
             except tweepy.TweepError as err:
+                print(err)
                 break
 
 
