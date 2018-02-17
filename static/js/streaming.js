@@ -1,49 +1,3 @@
-
-
-function hasActiveShape(layerGroup, shapeType) {
-  var flag = false;
-
-  layerGroup.eachLayer( (layer) => {
-    var color = layer.options.color;
-    if (color === Colors.darkred && layer instanceof shapeType)
-      flag = true;
-  });
-
-  return flag;
-}
-
-
-var Mapbox = {
-  satellite: 'mapbox.satellite',
-  streets: 'mapbox.streets',
-  outdoors: 'mapbox.outdoors',
-  url: 'https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?' +
-    'access_token={accessToken}',
-  attribution: 'Map data &copy; <a href="http://openstreetmap.org">' +
-    'OpenStreetMap</a> contributors, <a href="http://creativecommons.org/' +
-    'licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.' +
-    'com">Mapbox</a>',
-  accessToken: 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3' +
-    'gifQ.rJcFIG214AriISLbB6B5aw',
-};
-
-var Colors = {
-  // Negative sentiment
-  red: 'rgba(247, 46, 70, .5)',
-
-  // Neutral sentiment
-  blue: 'rgba(81, 185, 255, .5)',
-
-  // Positive sentiment
-  green: 'rgba(48, 229, 81, .5)',
-
-  // Active bounding box
-  darkred: '#893231',
-
-  // Non-active bounding box
-  black: '#000000'
-};
-
 var map;
 var chart;
 
@@ -277,6 +231,10 @@ $(function() {
         exportingButton: {
           text: '',
           _titleKey: 'empty',
+          onclick: function(e) {
+            socket.emit('stop_stream');
+            $('#chart-container').hide();
+          },
           symbol: 'exit'
         }
       }
@@ -418,9 +376,8 @@ $(function() {
     type: 'GET',
     dataType: 'json',
     success: function(data) {
-      const div = document.getElementById('hashtags-container');
-      const list = Array.from(div.querySelectorAll('a'));
-      const zipped = list.map(function(node, i) {
+      const nodes = Array.from(getChildrenOfElement('hashtags-container', 'a'));
+      const zipped = nodes.map(function(node, i) {
         return [node, data['result'][i]];
       });
 
@@ -430,6 +387,15 @@ $(function() {
     },
     error: function (request, error) {
     }
+  });
+
+  const nodes = Array.from(getChildrenOfElement('hashtags-container', 'a'));
+  nodes.forEach(function(node) {
+    node.addEventListener('click', function(e) {
+      const hashtag = node.innerHTML;
+      $('#chart-container').show();
+      socket.emit('start_stream', {'hashtag': hashtag, 'flow type': 'live'});
+    });
   });
 
   /* Websockets */
