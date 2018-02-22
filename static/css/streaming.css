@@ -22,11 +22,35 @@ html, body, #map {
     border: 2px solid #5231e9;
 }
 
-#sentiment {
-    width: 500px;
-    height: 401px;
-    border: 1px black solid;
+.highcharts {
     display: none;
+    background-color: white;
+}
+
+table {
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+tbody {
+    display: table-row-group;
+    vertical-align: middle;
+    border-color: inherit;
+}
+
+tr {
+    display: table-row;
+    vertical-align: inherit;
+    border-color: inherit;
+}
+
+td {
+    border: 0;
+}
+
+#sentiment, #volume {
+    min-width: 500px;
+    margin: 0 auto;
 }
 
 ul {

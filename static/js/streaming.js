@@ -1,5 +1,6 @@
 var map;
-var chart;
+var sentiment;
+var volume;
 
 var boundingBox;
 var geolocation;
@@ -77,7 +78,7 @@ var HashtagsControl = L.Control.extend({
   options: {
     position: 'bottomleft',
   },
-  onAdd: function (map) {
+  onAdd: function(map) {
     var div = L.DomUtil.create('div');
 
     div.id = "hashtags-container";
@@ -102,7 +103,7 @@ var SearchControl = L.Control.extend({
     name: 'hashtag',
     placeholder: 'Twitter Hashtag (e.g. #sdsc)'
   },
-  onAdd: function (map) {
+  onAdd: function(map) {
     var input = L.DomUtil.create('input', 'hashtag-input');
 
     input.type = this.options.type;
@@ -113,7 +114,7 @@ var SearchControl = L.Control.extend({
 
     L.DomEvent.on(input, 'keydown', function(e) {
       if (e.keyCode === 13) {
-        $("#sentiment").show();
+        $(".highcharts").show();
         message = {'hashtag': input.value, 'flow type': 'live'};
 
         if (hasActiveShape(drawnItems, L.Rectangle))
@@ -136,9 +137,28 @@ var ChartControl = L.Control.extend({
     position: 'bottomright'
   },
   onAdd: function (map) {
-    var div = L.DomUtil.create('div');
-    div.id = 'sentiment';
-    return div
+    var container = L.DomUtil.create('div', 'highcharts');
+    var table = L.DomUtil.create('table');
+    var tbody = L.DomUtil.create('tbody');
+
+    var tr = Array(3).fill().map((_,i) => L.DomUtil.create('tr'));
+    var td = Array(3).fill().map((_,i) => L.DomUtil.create('td'));
+
+    var sentiment = L.DomUtil.create('div');
+    var volume = L.DomUtil.create('div');
+
+    sentiment.id = 'sentiment';
+    volume.id = 'volume';
+
+    container.appendChild(table);
+    table.appendChild(tbody);
+
+    tr.forEach((r) => tbody.appendChild(r));
+    td.forEach((d, i) => tr[i].appendChild(d));
+
+    td[1].appendChild(sentiment)
+    td[2].appendChild(volume);
+    return container
   }
 });
 var chartControl = new ChartControl();
@@ -162,18 +182,17 @@ $(function() {
     accessToken: Mapbox.accessToken
   });
 
+  var baseMaps = {
+    'Streets': streets,
+    'Outdoors': outdoors,
+    'Satellite': satellite
+  };
 
   map = L.map('map', {
     center: [36.89, -119.58],
     zoom: 6,
     layers: [streets]
   });
-
-  var baseMaps = {
-    'Streets': streets,
-    'Outdoors': outdoors,
-    'Satellite': satellite
-  };
 
   L.control.layers(baseMaps).addTo(map);
 
@@ -202,22 +221,55 @@ $(function() {
   });
 
   /* Chart configuration */
-  chart = Highcharts.chart('sentiment', {
-    credits: {
-      enabled: false
+  volume = Highcharts.chart('volume', {
+
+    title:   {text: 'Sentiment Volume'},
+    credits: {enabled: false},
+
+    exporting: {
+      buttons: {
+        contextButton: {enabled: false}
+      }
     },
+
+    yAxis: {
+      min: 0,
+      title: {
+        text: 'Volume'
+      }
+    },
+
+    xAxis: {
+      type: 'datetime',
+      title: {
+        text: 'Date'
+      },
+      startOnTick: true,
+      endOnTick: true,
+      showLastLabel: true
+    },
+
+    series: [{
+      name: "Volume",
+      data: []
+    }]
+  });
+
+  sentiment = Highcharts.chart('sentiment', {
+
+    title:   { text: 'Sentiment Analysis' },
+    credits: { enabled: false },
+
     lang: {
       empty: ''
     },
+
     chart: {
       type: 'scatter',
       zoomType: '',
-      height: 400,
-      width: 500
     },
-    title: {
-      text: 'Sentiment Over Time '
-    },
+
+
     exporting: {
       buttons: {
         contextButton: {
@@ -228,13 +280,13 @@ $(function() {
           _titleKey: 'empty',
           onclick: function(e) {
             socket.emit('stop_stream');
-            $('#sentiment').hide();
+            $('.highcharts').hide();
           },
           symbol: 'exit'
         }
       }
     },
-    // Set up xAxis Attributes
+
     xAxis: {
       type: 'datetime',
       title: {
@@ -244,6 +296,7 @@ $(function() {
       endOnTick: true,
       showLastLabel: true
     },
+
     yAxis: {
       lineWidth: 1,
       min: -100,
@@ -252,6 +305,7 @@ $(function() {
         text: 'Sentiment'
       }
     },
+
     plotOptions: {
       scatter: {
         // Allows for dictionary format despite high data amount > 1000
@@ -269,6 +323,7 @@ $(function() {
 
       }
     },
+
     series: [{
       name: 'Tweets',
       zones: Zones,
@@ -305,7 +360,7 @@ $(function() {
   nodes.forEach(function(node) {
     node.addEventListener('click', function(e) {
       const hashtag = node.innerHTML;
-      $('#sentiment').show();
+      $('.highcharts').show();
       socket.emit('start_stream', {'hashtag': hashtag, 'flow type': 'live'});
     });
   });
@@ -316,41 +371,26 @@ $(function() {
   // The callback function is invoked whenever the server emits data
   // to the client. The data is then displayed in the "Received"
   // section of the page.
+  var unique = 0;
+  var total = 0;
   socket.on('response', function(msg) {
     var milliseconds = Date.parse(msg.created_at);
     // Dynamically add points to the first series
+    total += 1;
     if( msg.retweeted ) {
-      chart.series[1].addPoint([milliseconds, msg.sentiment * 100]);
+      sentiment.series[1].addPoint([milliseconds, msg.sentiment * 100]);
+      //volume.series[1].addPoint([milliseconds, total]);
     } else {
-      chart.series[0].addPoint([milliseconds, msg.sentiment * 100]);
+      sentiment.series[0].addPoint([milliseconds, msg.sentiment * 100]);
+      unique += 1;
+      //volume.series[0].addPoint([milliseconds, unique]);
     }
+    console.log(total);
+    volume.series[0].addPoint([milliseconds, total]);
   });
 
   $("#disconnect-btn").click(function() {
     socket.emit('stop_stream');
     return false;
-  });
-
-  // Interval function that tests message latency by sending a "ping"
-  // message. The server then responds with a "pong" message and the
-  // round trip time is measured.
-  var ping_pong_times = [];
-  var start_time;
-  window.setInterval(function() {
-    start_time = (new Date).getTime();
-    socket.emit('my_ping');
-  }, 1000);
-
-  // Handler for the "pong" message. When the pong is received, the
-  // time from the ping is stored, and the average of the last 30
-  // samples is average and displayed.
-  socket.on('my_pong', function() {
-    var latency = (new Date).getTime() - start_time;
-    ping_pong_times.push(latency);
-    ping_pong_times = ping_pong_times.slice(-30); // keep last 30 samples
-    var sum = 0;
-    for (var i = 0; i < ping_pong_times.length; i++)
-      sum += ping_pong_times[i];
-    $('#ping-pong').text(Math.round(10 * sum / ping_pong_times.length) / 10);
   });
 });
