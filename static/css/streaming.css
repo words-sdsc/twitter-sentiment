@@ -21,7 +21,8 @@ html, body, #map {
 .hashtag-input:focus {
     border: 2px solid #5231e9;
 }
-#chart-container {
+
+#sentiment {
     width: 500px;
     height: 401px;
     border: 1px black solid;

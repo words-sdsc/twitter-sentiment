@@ -113,7 +113,7 @@ var SearchControl = L.Control.extend({
 
     L.DomEvent.on(input, 'keydown', function(e) {
       if (e.keyCode === 13) {
-        $("#chart-container").show();
+        $("#sentiment").show();
         message = {'hashtag': input.value, 'flow type': 'live'};
 
         if (hasActiveShape(drawnItems, L.Rectangle))
@@ -137,7 +137,7 @@ var ChartControl = L.Control.extend({
   },
   onAdd: function (map) {
     var div = L.DomUtil.create('div');
-    div.id = 'chart-container';
+    div.id = 'sentiment';
     return div
   }
 });
@@ -175,11 +175,6 @@ $(function() {
     'Satellite': satellite
   };
 
-  var overlayMaps = {
-    'Live': drawnItems,
-    'Historical': drawnItems
-  };
-
   L.control.layers(baseMaps).addTo(map);
 
   map.addLayer(drawnItems);
@@ -207,7 +202,7 @@ $(function() {
   });
 
   /* Chart configuration */
-  chart = Highcharts.chart('chart-container', {
+  chart = Highcharts.chart('sentiment', {
     credits: {
       enabled: false
     },
@@ -233,7 +228,7 @@ $(function() {
           _titleKey: 'empty',
           onclick: function(e) {
             socket.emit('stop_stream');
-            $('#chart-container').hide();
+            $('#sentiment').hide();
           },
           symbol: 'exit'
         }
@@ -270,105 +265,22 @@ $(function() {
               lineColor: 'rgb(100,100,100)'
             }
           }
-        },
-        states: {
-          hover: {
-            marker: {
-              enabled: false
-            }
-          }
         }
-      },
-      series: {
-        point: {
-          events: {
-            click: function() {
-              alert("Tweet Text:\n" + this.text);
-              console.log("This x = " + this.x);
-              console.log("This y = " + this.y)
-              //console.log("This tweetID = " + this.tweetId);
-              console.log("This tweetText = " + this.text)
-            }
-          }
-        }
+
       }
     },
-
     series: [{
-      // Title of Each Point
-      name: 'Sentiment',
-
-      // Change colors based on POSITIVE, NEGATIVE, NEUTRAL
-      zones: [
-      {
-        // Negative
-        value: -5,
-        color: Colors.red
-      }, {
-        // Neutral
-        value: 5,
-        color: Colors.blue
-      }, {
-        // Positive
-        color: Colors.green
-      }
-      ],
-
-      //pointInterval: 1000,
-
-      // Pointer description
-      pointDescriptionFormatter: function() {
-        return 'The value for <b>' + this.x + '</b> is <b>' + this.y + '</b>, in series '+ this.series.name;
-      },
+      name: 'Tweets',
+      zones: Zones,
       data: []
     },
-    {	// Series dedicated for retweets
-
-      // Display Linear Regression
-      regression: true,
-      regressionSettings: {
-        type: 'polynomial',
-        color:  'rgba(229, 70, 52, .7)'
-      },
-
-      // Title of Each Point
-      name: 'Sentiment',
-
-      // Change colors based on POSITIVE, NEGATIVE, NEUTRAL
-      zones: [
-      {
-        // Negatie
-        value: -5,
-        color: Colors.red
-      }, {
-        // Neutral
-        value: 5,
-        color: Colors.blue
-      }, {
-        // Positive
-        color: Colors.green
-      }
-      ],
-
-      //pointInterval: 1000,
-
-      // Pointer description
-      pointDescriptionFormatter: function() {
-        return 'The value for <b>' + this.x + '</b> is <b>' + this.y + '</b>, in series '+ this.series.name;
-      },
+    {
+      name: 'Retweets',
+      zones: Zones,
       data: []
     }]
   });
 
-
-  $('#hideRetweets').click(function () {
-    console.log("Hide retweets");
-    chart.series[1].hide();
-  });
-  $('#showRetweets').click(function () {
-    console.log("Show retweets");
-    chart.series[1].show();
-  });
 
   /* AJAX call to get the top 3 hashtags on CALFIRE */
   $.ajax({
@@ -393,7 +305,7 @@ $(function() {
   nodes.forEach(function(node) {
     node.addEventListener('click', function(e) {
       const hashtag = node.innerHTML;
-      $('#chart-container').show();
+      $('#sentiment').show();
       socket.emit('start_stream', {'hashtag': hashtag, 'flow type': 'live'});
     });
   });
@@ -405,19 +317,12 @@ $(function() {
   // to the client. The data is then displayed in the "Received"
   // section of the page.
   socket.on('response', function(msg) {
-    $('#log').append('<br>' + $('<div/>')
-             .text('Received #' + msg.sentiment + ': ' + msg.text + " AT " + msg.created_at)
-             .html());
-    console.log("Retweeted: " + msg.retweeted);
-
     var milliseconds = Date.parse(msg.created_at);
     // Dynamically add points to the first series
     if( msg.retweeted ) {
       chart.series[1].addPoint([milliseconds, msg.sentiment * 100]);
-      //chart.series[1].addPoint(msg.sentiment * 100, true, false, true);
     } else {
       chart.series[0].addPoint([milliseconds, msg.sentiment * 100]);
-      //chart.series[0].addPoint(msg.sentiment * 100, true, false, true);
     }
   });
 

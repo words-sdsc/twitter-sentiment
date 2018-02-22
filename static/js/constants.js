@@ -28,3 +28,27 @@ var Colors = {
   // Non-active bounding box
   black: '#000000'
 };
+
+/* for each sentiment class, the value determines the upper boundary where the
+ * sentiment zone extends on the highchart.
+ *
+ * NOTE: undefined means the zone stretches to the last value in the series
+ */
+var Boundary = {
+  negative: -5,
+  neutral:   5,
+  positive: undefined
+}
+
+var Zones = [
+  {
+    value: Boundary.negative,
+    color: Colors.red
+  }, {
+    value: Boundary.neutral,
+    color: Colors.blue
+  }, {
+    value: Boundary.positive,
+    color: Colors.green
+  }
+];
