@@ -226,6 +226,11 @@ $(function() {
     title:   {text: 'Sentiment Volume'},
     credits: {enabled: false},
 
+    chart: {
+      width: 500,
+      height: 300
+    },
+
     exporting: {
       buttons: {
         contextButton: {enabled: false}
@@ -250,7 +255,11 @@ $(function() {
     },
 
     series: [{
-      name: "Volume",
+      name: 'Unique Tweets',
+      data: []
+    },
+    {
+      name: 'Total',
       data: []
     }]
   });
@@ -267,6 +276,8 @@ $(function() {
     chart: {
       type: 'scatter',
       zoomType: '',
+      width: 500,
+      height: 300
     },
 
 
@@ -375,18 +386,18 @@ $(function() {
   var total = 0;
   socket.on('response', function(msg) {
     var milliseconds = Date.parse(msg.created_at);
+    var now = Date.now();
+    total = total + 1;
+
     // Dynamically add points to the first series
-    total += 1;
     if( msg.retweeted ) {
+      unique = unique + 1;
       sentiment.series[1].addPoint([milliseconds, msg.sentiment * 100]);
-      //volume.series[1].addPoint([milliseconds, total]);
+      volume.series[0].addPoint([now, unique]);
     } else {
       sentiment.series[0].addPoint([milliseconds, msg.sentiment * 100]);
-      unique += 1;
-      //volume.series[0].addPoint([milliseconds, unique]);
     }
-    console.log(total);
-    volume.series[0].addPoint([milliseconds, total]);
+    volume.series[1].addPoint([now, total]);
   });
 
   $("#disconnect-btn").click(function() {
