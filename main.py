@@ -6,7 +6,6 @@ from TwitterScraper.spiders.searchMiner import *
 from SentimentAnalysis.cleanTweets import *
 from SentimentAnalysis.sentimentAnalysis import *
 
-#from settings import *
 # Main driver for the program
 
 index = 0
