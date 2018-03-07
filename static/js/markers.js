@@ -21,23 +21,23 @@
       var div = document.createElement('div');
       var options = this.options;
 
-			this._setIconStyle(div, 'icon-' + options.markerColor);
+      this._setIconStyle(div, 'icon-' + options.markerColor);
       return div;
     },
 
     createShadow: function () {
       var div = document.createElement('div');
-			this._setIconStyle(div, 'shadow');
+      this._setIconStyle(div, 'shadow');
       return div;
     },
 
     _setIconStyle: function (marker, type) {
-			var options = this.options,
-          size = L.point(options[name === 'shadow' ? 'shadowSize' : 'iconSize']),
-          anchor;
+      var options = this.options,
+      size = L.point(options[name === 'shadow' ? 'shadowSize' : 'iconSize']),
+      anchor;
 
       if (name === 'shadow') {
-      	anchor = L.point(options.shadowAnchor || options.iconAnchor);
+        anchor = L.point(options.shadowAnchor || options.iconAnchor);
       } else {
         anchor = L.point(options.iconAnchor);
       }
@@ -56,7 +56,7 @@
       if (size) {
         marker.style.width  = size.x + 'px';
         marker.style.height = size.y + 'px';
-			}
+      }
     }
   });
 
