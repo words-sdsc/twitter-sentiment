@@ -206,7 +206,8 @@ $(function() {
     drawnItems.addLayer(e.layer);
   });
 
-
+	myicon = L.DisasterMarkers.icon({markerColor: 'red'});
+ 	L.marker([32.7157, -117.1611], {icon: myicon}).addTo(map);
   /* Generating a cross symbol to place on sentiment analysis charts. The
    * cross symbol is meant to close down the chart and stop the stream flow when
    * clicked.
