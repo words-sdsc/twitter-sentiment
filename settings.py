@@ -1,8 +1,4 @@
-from pathlib import Path
-
-
-CREDENTIALS_PATH = Path.cwd() / '.credentials'
-
+CREDENTIALS_PATH = '.credentials'
 
 def init():
     global url

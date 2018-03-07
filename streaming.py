@@ -199,7 +199,7 @@ class CredentialsManager():
     def read(self):
         c = Credentials()
 
-        with self._path.open() as f:
+        with open(self._path, 'r') as f:
             for line in f:
                 k, v = line.strip().split('=')
                 c[k] = v
@@ -207,7 +207,7 @@ class CredentialsManager():
         return c
 
     def write(self, credentials):
-        with self._path.open('w') as f:
+        with open(self._path, 'w') as f:
             for k, v in credentials.items():
                 f.write(k + '=' + v + '\n')
 
