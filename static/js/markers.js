@@ -3,11 +3,11 @@
   L.DisasterMarkers.version = '0.0.1';
   L.DisasterMarkers.Icon = L.Icon.extend({
     options: {
-      iconSize: 		[35, 45],
-      iconAnchor: 	[17, 42],
-      popupAnchor: 	[1, -32],
+      iconSize: [35, 45],
+      iconAnchor: [17, 42],
+      popupAnchor: [1, -32],
       shadowAnchor: [10, 12],
-      shadowSize: 	[36, 16],
+      shadowSize: [36, 16],
       className: 'disaster-marker',
       markerColor: 'blue',
       iconColor: 'white'

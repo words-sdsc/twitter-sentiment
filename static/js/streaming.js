@@ -400,9 +400,4 @@ $(function() {
     }
     volume.series[1].addPoint([now, total]);
   });
-
-  $("#disconnect-btn").click(function() {
-    socket.emit('stop_stream');
-    return false;
-  });
 });
