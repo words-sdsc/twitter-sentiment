@@ -228,6 +228,7 @@ $(function() {
     credits: {enabled: false},
 
     chart: {
+      type: 'area',
       width: 500,
       height: 300
     },
@@ -239,7 +240,6 @@ $(function() {
     },
 
     yAxis: {
-      min: 0,
       title: {
         text: 'Volume'
       }
@@ -256,11 +256,13 @@ $(function() {
     },
 
     series: [{
-      name: 'Unique Tweets',
+      name: 'Negative',
+      color: Colors.red,
       data: []
     },
     {
-      name: 'Total',
+      name: 'Positive',
+      color: Colors.green,
       data: []
     }]
   });
@@ -383,21 +385,27 @@ $(function() {
   // The callback function is invoked whenever the server emits data
   // to the client. The data is then displayed in the "Received"
   // section of the page.
-  var unique = 0;
-  var total = 0;
+  var cpos = {}
+  var cneg = {}
   socket.on('response', function(msg) {
     var milliseconds = Date.parse(msg.created_at);
     var now = Date.now();
-    total = total + 1;
 
     // Dynamically add points to the first series
     if( msg.retweeted ) {
-      unique = unique + 1;
       sentiment.series[1].addPoint([milliseconds, msg.sentiment * 100]);
-      volume.series[0].addPoint([now, unique]);
     } else {
       sentiment.series[0].addPoint([milliseconds, msg.sentiment * 100]);
     }
-    volume.series[1].addPoint([now, total]);
+
+    if (msg.sentiment * 100 < 0) {
+      if (!cneg.hasOwnProperty(milliseconds)) cneg[milliseconds] = 0;
+      cneg[milliseconds] = cneg[milliseconds] + 1;
+      volume.series[0].addPoint([milliseconds, -1 * cneg[milliseconds]]);
+    } else if (msg.sentiment * 100 > 0) {
+      if (!cpos.hasOwnProperty(milliseconds)) cpos[milliseconds] = 0;
+      cpos[milliseconds] = cpos[milliseconds] + 1;
+      volume.series[1].addPoint([milliseconds, cpos[milliseconds]]);
+    }
   });
 });

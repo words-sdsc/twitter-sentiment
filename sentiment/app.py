@@ -1,10 +1,10 @@
 from flask import Flask, render_template, request, jsonify
+from flask_socketio import SocketIO, emit
 
-import sqlite3
+import os, sqlite3
 
 # Imports for Web Sockets
 from threading import Lock
-from flask_socketio import SocketIO, emit 
 
 # Local Imports
 import settings
@@ -28,7 +28,7 @@ def configure():
     path = settings.CREDENTIALS_PATH
     manager = CredentialsManager(path)
 
-    if path.exists():
+    if os.path.exists(path):
         cred = manager.read()
     else:
         cred = Credentials()
@@ -153,4 +153,4 @@ def start_stream(message):
 
 if __name__ == "__main__":
     print("Running server...")
-    socketio.run(app)
+    socketio.run(app, debug=1)
