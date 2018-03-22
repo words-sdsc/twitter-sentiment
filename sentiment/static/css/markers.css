@@ -1,0 +1,98 @@
+/* Marker setup */
+.disaster-marker {
+  background: url('../images/markers-soft.png') no-repeat 0 0;
+  width: 35px;
+  height: 46px;
+  position:absolute;
+  left:0;
+  top:0;
+  display: block;
+  text-align: center;
+}
+
+.disaster-marker-shadow {
+  background: url('../images/markers-shadow.png') no-repeat 0 0;
+  width: 36px;
+  height: 16px;
+}
+
+.disaster-marker .icon-white {
+  color: #fff;
+}
+
+/* Colors */
+.disaster-marker-icon-red {
+  background-position: 0 0;
+}
+
+.disaster-marker-icon-darkred {
+  background-position: -180px 0;
+}
+
+.disaster-marker-icon-lightred {
+  background-position: -360px 0;
+}
+
+.disaster-marker-icon-orange {
+  background-position: -36px 0;
+}
+
+.disaster-marker-icon-beige {
+  background-position: -396px 0;
+}
+
+.disaster-marker-icon-green {
+  background-position: -72px 0;
+}
+
+.disaster-marker-icon-darkgreen {
+  background-position: -252px 0;
+}
+
+.disaster-marker-icon-lightgreen {
+  background-position: -432px 0;
+}
+
+.disaster-marker-icon-blue {
+  background-position: -108px 0;
+}
+
+.disaster-marker-icon-darkblue {
+  background-position: -216px 0;
+}
+
+.disaster-marker-icon-lightblue {
+  background-position: -468px 0;
+}
+
+.disaster-marker-icon-purple {
+  background-position: -144px 0;
+}
+
+.disaster-marker-icon-darkpurple {
+  background-position: -288px 0;
+}
+
+.disaster-marker-icon-pink {
+  background-position: -504px 0;
+}
+
+.disaster-marker-icon-cadetblue {
+  background-position: -324px 0;
+}
+
+.disaster-marker-icon-white {
+  background-position: -574px 0;
+}
+
+.disaster-marker-icon-gray {
+  background-position: -648px 0;
+}
+
+.disaster-marker-icon-lightgray {
+  background-position: -612px 0;
+}
+
+.disaster-marker-icon-black {
+  background-position: -682px 0;
+}

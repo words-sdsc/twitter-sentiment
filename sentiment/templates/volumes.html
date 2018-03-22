@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+
+<!-- Basic scripts for highcharts API -->
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+<!-- Scripts for linear regression -->
+<script src="//rawgithub.com/phpepe/highcharts-regression/master/highcharts-regression.js"> </script>
+
+
+<!-- Link chart display function: displayChart(data) -->
+<script type="text/javascript" src="{{ url_for('static', filename='displayVolume.js') }}"> </script>
+
+<!-- Styles -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/result_styles.css') }}">
+
+
+<body>
+	<h1 id=resultsTitle>Results page</h1>
+    <h1>{{ table_choice }}</h1>
+    <h1>Volume over Time #1</h1>
+    <div id="container3"></div>
+
+    <button id="large">Large</button>
+    <button id="small">Small</button>
+    <button id="auto">Auto</button></body>
+
+    <ol>
+		{% for name in tableNamesList %}
+    			<li class="tweets">{{ name }}</div>
+  		{% endfor %}
+  	</ol>
+
+	<p>
+		<ol>
+		{% for message in tweetsList %}
+    			<li class="tweets">{{ message }}</div>
+  		{% endfor %}
+  		</ol>
+	</p>
+</body>
+
+<script type="text/javascript"> displayVolume("container3", "{{table_choice}}", {{ tweetsList | safe}}); </script>
+
+
+</html>
