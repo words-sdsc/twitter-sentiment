@@ -15,7 +15,7 @@ are then displayed on a python webserver where the sentiment over time is displa
     ```
 2. Create a Twitter application (https://apps.twitter.com)
 3. Get your API Key, API Secret, Access Token, and Access Token Secret
-4. Configure your Twitter API keys on the Flask app
+4. Save your Twitter API keys locally by running the following:
 
     ```
     $ export FLASK_APP=app.py
